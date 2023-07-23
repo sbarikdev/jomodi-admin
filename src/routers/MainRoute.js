@@ -9,6 +9,12 @@ import Order from '../components/order/Order';
 import AddProduct from '../components/addProduct/AddProduct';
 import ProductDetails from '../components/product/ProductDetails';
 import ProductList from '../components/product/ProductList';
+import AddCategory from '../components/addProduct/AddCategory';
+import AddBrand from '../components/addProduct/AddBrand';
+import ProductTable from '../components/table/ProductTable';
+import CategoryTable from '../components/table/CategoryTable';
+import BrandTable from '../components/table/BrandTable';
+import OrderTable from '../components/table/OrderTable';
 
 function MainRoute() {
     return (
@@ -23,6 +29,12 @@ function MainRoute() {
                 <Route path="add-product" element={<AddProduct />} />
                 <Route path="product-details/:id/:slug" element={<ProductDetails />} />
                 <Route path="product-list" element={<ProductList />} />
+                <Route path="add-category" element={<AddCategory />} />
+                <Route path="add-brand" element={<AddBrand />} />
+                <Route path="product-table" element={<ProductTable />} />
+                <Route path="category-table" element={<CategoryTable />} />
+                <Route path="brand-table" element={<BrandTable />} />
+                <Route path="order-table" element={<OrderTable />} />
                 <Route path="*" element={<h1>Not Found</h1>} />
             </Route>
         </Routes>

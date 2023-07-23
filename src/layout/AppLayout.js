@@ -1,42 +1,29 @@
 import React, { useState } from "react";
-import {
-  AppShell, Navbar, Header, Text,
-  Footer,
-  Aside,
-  MediaQuery,
-  Burger,
-  useMantineTheme,
-} from "@mantine/core";
+import { AppShell, useMantineTheme } from "@mantine/core";
+import { Navbar, Header } from '@mantine/core';
 import { Outlet } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import AppSide from "../components/AppSide";
 
-
-
 function MainLayout(props) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+
   return (
-
-    <AppShell
-      styles={{
-        main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-        },
-      }}
-      navbarOffsetBreakpoint="sm"
-      asideOffsetBreakpoint="sm"
-      header={
-        <AppHeader />
-      }
-      navbar={
-        <AppSide p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }} />
-      }
-      
-    >
+      <AppShell
+        padding="md"
+        navbar={<Navbar width={{ base: 300 }} height={500} p="xs">
+          <AppSide />
+        </Navbar>}
+        header={<Header height={60} p="xs">
+          <AppHeader />
+        </Header>}
+        styles={(theme) => ({
+          main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
+        })}
+      >
       <Outlet />
-    </AppShell>
-
+      </AppShell>
   );
 }
 
