@@ -94,9 +94,9 @@ export default function AppSide() {
 
             <Navbar.Section className={classes.footer}>
                 <UserButton
-                    image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-                    name="Ann Nullpointer"
-                    email="anullpointer@yahoo.com"
+                    image="https://images.unsplash.com/photo-1612833609249-5e9a9f8a4b0f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YWRtaW58ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80"
+                    name="Admin"
+                    email="admin@jomodi.com"
                 />
             </Navbar.Section>
         </Navbar>
