@@ -34,18 +34,18 @@ const mockdata = [
             { label: 'Brand', link: '/brand-table' },
         ],
     },
-    { label: 'Analytics', icon: IconPresentationAnalytics },
-    { label: 'Contracts', icon: IconFileAnalytics },
-    { label: 'Settings', icon: IconAdjustments },
-    {
-        label: 'Security',
-        icon: IconLock,
-        links: [
-            { label: 'Enable 2FA', link: '/' },
-            { label: 'Change password', link: '/' },
-            { label: 'Recovery codes', link: '/' },
-        ],
-    },
+    // { label: 'Analytics', icon: IconPresentationAnalytics },
+    // { label: 'Contracts', icon: IconFileAnalytics },
+    // { label: 'Settings', icon: IconAdjustments },
+    // {
+    //     label: 'Security',
+    //     icon: IconLock,
+    //     links: [
+    //         { label: 'Enable 2FA', link: '/' },
+    //         { label: 'Change password', link: '/' },
+    //         { label: 'Recovery codes', link: '/' },
+    //     ],
+    // },
 ];
 
 const useStyles = createStyles((theme) => ({

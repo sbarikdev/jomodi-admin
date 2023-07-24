@@ -16,6 +16,7 @@ function App() {
   return (
 
       <Router>
+      <Notifications position="top-right" zIndex={2077} />
         <AppHeader />
         <Routes>
           <Route path="/*" element={<MainRoute />} />
