@@ -11,13 +11,19 @@ import {
   FileInput,
   Checkbox,
   Select,
-  NumberInput
+  NumberInput,
+  Modal,
+  UnstyledButton, Text, Group, Loader
 } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
+import { IconPlus } from "@tabler/icons-react";
+import {notifications} from "@mantine/notifications";
+import { useNavigate } from "react-router-dom";
 
 
 const AddProduct = () => {
+  const navigate = useNavigate();
   const [allCategory, setAllCategory] = useState([]);
   const [allBrand, setAllBrand] = useState([]);
   const [image, setImage] = useState({ base64: "", files: [] });
@@ -38,9 +44,15 @@ const AddProduct = () => {
   const [showGender, setShowGender] = useState(false);
   const [inStock, setInStock] = useState(false);
   const [additionalImages, setAdditionalImages] = useState([]);
-  
+  const [showSizeModal, setShowSizeModal] = useState(false)
+  const [showColorModal, setShowColorModal] = useState(false)
+  const [sizes, setSizes] = useState('')
+  const [colors, setColors] = useState("")
+  const [loading, setLoading] = useState(false)
+
+
+
   const handleImageChange = (files) => {
-    // Function to update the additional images state
     setAdditionalImages(files);
   };
 
@@ -75,17 +87,18 @@ const AddProduct = () => {
     };
   });
 
-    const allBrandList = allBrand?.map((item) => {
-      return {
-        value: item.id,
-        label: item.name,
-        category: item.category,
+  const allBrandList = allBrand?.map((item) => {
+    return {
+      value: item.id,
+      label: item.name,
+      category: item.category,
     }
   }
-    );
+  );
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData();
     formData.append("category", category);
     formData.append("brand", brand);
@@ -114,17 +127,69 @@ const AddProduct = () => {
           formDat.append("image", file);
           axios.post(`${API_URL}product/product_image/`, formDat);
         });
-        alert("Product Added Successfully");
+        sizes.split(',').forEach((item) => {
+          const formDat = new FormData();
+          formDat.append("product", res.data.id);
+          formDat.append("size", item);
+          axios.post(`${API_URL}product/size/`, formDat);
+        });
+        colors.split(',').forEach((item) => {
+          const formDat = new FormData();
+          formDat.append("product", res.data.id);
+          formDat.append("color", item);
+          axios.post(`${API_URL}product/color/`, formDat);
+        }
+        );
+        setLoading(false)
+        notifications.show({
+          title: "Product Added",
+          message: "Product Added Successfully",
+          color: "blue",
+          autoClose: 5000,
+        });
+        navigate('/dashboard')
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false)
         alert("Something went wrong");
       });
   };
 
-
   return (
     <Container size="sm">
+      <Modal opened={showSizeModal} onClose={() => setShowSizeModal(false)} size="md">
+        <Modal.Header>Add Size</Modal.Header>
+        <Modal.Body>
+          <TextInput
+            label="Product Sizes"
+            placeholder="Enter Sizes"
+            value={sizes}
+            onChange={(e) => setSizes(e.target.value)
+            }
+          />
+        </Modal.Body>
+        <Button onClick={() => setShowSizeModal(false)}>Save</Button>
+      </Modal>
+      <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md">
+        <Modal.Header>Add Color </Modal.Header>
+        <Modal.Body>
+          <TextInput
+            label="Product Color"
+            placeholder="Enter Color"
+            value={colors}
+            onChange={(e) => setColors(e.target.value)
+            }
+          />
+        </Modal.Body>
+        <Button onClick={() => setShowColorModal(false)}>Save </Button>
+      </Modal>
+      <h1>Add Product</h1>
+      {
+        loading && (
+          <Loader size="xl" variant="bars" />
+        )
+      }
       <Card shadow="sm">
         <form onSubmit={handleSubmit} encType="multipart/form-data">
           <Grid>
@@ -176,7 +241,6 @@ const AddProduct = () => {
                 required
               />
             </Col>
-      
             <Col span={12}>
               <Textarea
                 value={description}
@@ -202,7 +266,7 @@ const AddProduct = () => {
                 placeholder="Additional Images"
               />
             </Col>
-       
+
             <Col span={12}>
               <NumberInput value={availableQuantity} onChange={setAvailableQuantity} label="Available Quantity" placeholder="Available Quantity" />
             </Col>
@@ -236,44 +300,80 @@ const AddProduct = () => {
             </Col>
             <Col span={4}>
               <Checkbox
-              label="Top Product"
-              checked={topProduct}
-              onChange={(event) => setTopProduct(event.currentTarget.checked)}
+                label="Top Product"
+                checked={topProduct}
+                onChange={(event) => setTopProduct(event.currentTarget.checked)}
               />
             </Col>
             <Col span={4}>
               <Checkbox
-              label="New Product"
-              checked={newProduct}
-              onChange={(event) => setNewProduct(event.currentTarget.checked)}
+                label="New Product"
+                checked={newProduct}
+                onChange={(event) => setNewProduct(event.currentTarget.checked)}
               />
             </Col>
             <Col span={4}>
               <Checkbox
-              label="Show Size"
-              checked={showSize}
-              onChange={(event) => setShowSize(event.currentTarget.checked)}
+                label="Show Size"
+                checked={showSize}
+                onChange={(event) => setShowSize(event.currentTarget.checked)}
               />
-            </Col>
-            <Col span={4}>
-              <Checkbox
-              label="Show Color"
-              checked={showColor}
-              onChange={(event) => setShowColor(event.currentTarget.checked)}
-              />
-            </Col>
-            <Col span={4}>
-              <Checkbox
-              label="Show Gender"
-              checked={showGender}
-              onChange={(event) => setShowGender(event.currentTarget.checked)}
-              />
-            </Col>
-          
-          </Grid>
-          
+              {
+                showSize && (
+                  <UnstyledButton onClick={() => setShowSizeModal(true)} >
+                    <IconPlus size={20} />
+                  </UnstyledButton>
+                )
+              }
+              <Group mt="sm" position="left">
+                {
+                  sizes.split(',').map((item) => {
+                    return (
+                      <Text>{item}</Text>
+                    )
+                  })
+                }
+              </Group>
 
-          <Button mt="xl" type="submit" color="blue">
+            </Col>
+            <Col span={4}>
+              <Checkbox
+                label="Show Color"
+                checked={showColor}
+                onChange={(event) => setShowColor(event.currentTarget.checked)}
+              />
+              {
+                showColor && (
+                  <UnstyledButton onClick={() => setShowColorModal(true)}>
+                    <IconPlus size={20} />
+                  </UnstyledButton>
+                )
+              }
+              <Group mt="sm" position="left">
+                {
+                  colors.split(',').map((item) => {
+                    return (
+                      <Text>{item}</Text>
+                    )
+                  })
+                }
+              </Group>
+            </Col>
+            <Col span={4}>
+              <Checkbox
+                label="Show Gender"
+                checked={showGender}
+                onChange={(event) => setShowGender(event.currentTarget.checked)}
+              />
+            </Col>
+
+          </Grid>
+
+
+          <Button mt="xl" type="submit" color="blue"
+          loading={loading}
+          disabled={loading}
+          >
             Add Product
           </Button>
         </form>

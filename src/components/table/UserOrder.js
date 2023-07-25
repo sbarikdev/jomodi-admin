@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import { IconEdit, IconEye, IconTrash, IconSearch } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { Checkbox } from "tabler-icons-react";
+import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
-const OrderTable = () => {
+const UserOrder = () => {
+    const { id } = useParams();
     const [orderData, setOrderData] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
@@ -109,7 +111,7 @@ const OrderTable = () => {
 
     useEffect(() => {
         axios
-            .get(`${API_URL}order/order-detail/`)
+            .get(`${API_URL}order/order-fetch/?user_id=${id}`)
             .then((res) => {
                 console.log(res.data.results);
                 setOrderData(res.data.results);
@@ -118,7 +120,7 @@ const OrderTable = () => {
             .catch((err) => {
                 console.log(err);
             });
-    }, []);
+    }, [id]);
 
 
 
@@ -326,4 +328,4 @@ const OrderTable = () => {
     );
 };
 
-export default OrderTable;
+export default UserOrder;

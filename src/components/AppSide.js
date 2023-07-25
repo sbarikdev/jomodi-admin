@@ -1,4 +1,11 @@
-import { Navbar, Group, Code, ScrollArea, createStyles, rem } from '@mantine/core';
+import { Navbar, Group, Code, ScrollArea, createStyles, rem,
+    Box,
+    Collapse,
+    ThemeIcon,
+    Text,
+    UnstyledButton,
+
+} from '@mantine/core';
 import {
     IconNotes,
     IconCalendarStats,
@@ -10,10 +17,11 @@ import {
 } from '@tabler/icons-react';
 import { UserButton } from './UserButton';
 import { LinksGroup } from './NavbarLinksGroup';
+import { useNavigate } from 'react-router-dom';
 // import { Logo } from './Logo';
 
 const mockdata = [
-    { label: 'Dashboard', icon: IconGauge, link: '/' },
+    // { label: 'Dashboard', icon: IconGauge, links : [ {link: '/dashboard' }]},
     {
         label: 'Add Forms',
         icon: IconNotes,
@@ -22,6 +30,7 @@ const mockdata = [
             { label: 'Products', link: '/add-product' },
             { label: 'Category', link: '/add-category' },
             { label: 'Brand', link: '/add-brand' },
+            { label: 'Banner', link: '/add-banner'}
         ],
     },
     {
@@ -32,6 +41,8 @@ const mockdata = [
             { label: 'Order', link: '/order-table' },
             { label: 'Category', link: '/category-table' },
             { label: 'Brand', link: '/brand-table' },
+            { label: 'User', link: '/user' },
+            { label: 'NewLetter', link: '/newsletter' },
         ],
     },
     // { label: 'Analytics', icon: IconPresentationAnalytics },
@@ -84,12 +95,16 @@ const useStyles = createStyles((theme) => ({
 
 export default function AppSide() {
     const { classes } = useStyles();
+    const navigate = useNavigate();
     const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
 
     return (
         <Navbar width={{ sm: 300 }} p="md" className={classes.navbar}>
             <Navbar.Section grow className={classes.links} component={ScrollArea}>
-                <div className={classes.linksInner}>{links}</div>
+                
+                <div className={classes.linksInner}>
+                   
+                    {links}</div>
             </Navbar.Section>
 
             <Navbar.Section className={classes.footer}>

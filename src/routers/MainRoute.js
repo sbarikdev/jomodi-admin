@@ -15,6 +15,9 @@ import ProductTable from '../components/table/ProductTable';
 import CategoryTable from '../components/table/CategoryTable';
 import BrandTable from '../components/table/BrandTable';
 import OrderTable from '../components/table/OrderTable';
+import UserProfile from '../components/table/UserProfile';
+import NewsLetter from '../components/table/NewsLetter';
+import UserOrder from '../components/table/UserOrder';
 
 function MainRoute() {
     return (
@@ -35,6 +38,9 @@ function MainRoute() {
                 <Route path="category-table" element={<CategoryTable />} />
                 <Route path="brand-table" element={<BrandTable />} />
                 <Route path="order-table" element={<OrderTable />} />
+                <Route path="user" element={<UserProfile />} />
+                <Route path="newsletter" element={<NewsLetter />} />
+                <Route path="user-order/:id" element={<UserOrder />} />
                 <Route path="*" element={<h1>Not Found</h1>} />
             </Route>
         </Routes>

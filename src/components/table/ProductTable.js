@@ -30,6 +30,7 @@ import {
     Image,
 } from "@mantine/core";
 
+
 const ProductTable = () => {
     const [productData, setProductData] = useState([]);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -38,23 +39,8 @@ const ProductTable = () => {
     const [allCategory, setAllCategory] = useState([]);
     const [allBrand, setAllBrand] = useState([]);
     const [image, setImage] = useState({ base64: "", files: [] });
-    const [category, setCategory] = useState(selectedProduct?.category?.id ?? "");
-    const [brand, setBrand] = useState(selectedProduct?.brand?.id ?? "");
-    const [name, setName] = useState(selectedProduct?.name ?? "");
-    const [price, setPrice] = useState("");
-    const [availableQuantity, setAvailableQuantity] = useState("");
-    const [cancelPrice, setCancelPrice] = useState("");
-    const [description, setDescription] = useState("");
-    const [discount, setDiscount] = useState(false);
-    const [newArrival, setNewArrival] = useState(false);
-    const [homeProduct, setHomeProduct] = useState(false);
-    const [topProduct, setTopProduct] = useState(false);
-    const [newProduct, setNewProduct] = useState(false);
-    const [showSize, setShowSize] = useState(false);
-    const [showColor, setShowColor] = useState(false);
-    const [showGender, setShowGender] = useState(false);
-    const [inStock, setInStock] = useState(false);
     const [additionalImages, setAdditionalImages] = useState([]);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         axios
@@ -227,8 +213,10 @@ const ProductTable = () => {
                                 data={
                                     allCategoryList
                                 }
-                                value={category || selectedProduct?.category?.id}
-                                onChange={setCategory}
+                                value={selectedProduct?.category?.id}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e })}
+                            // value={category || selectedProduct?.category?.id}
+                            // onChange={setCategory}
                             />
                         </Col>
                         <Col span={12}>
@@ -236,17 +224,17 @@ const ProductTable = () => {
                                 label="Select Brand"
                                 placeholder="Select Brand"
                                 data={(
-                                    allBrandList.filter((item) => (item.category.id == selectedProduct?.category.id ))
+                                    allBrandList.filter((item) => (item.category.id == selectedProduct?.category))
                                 )
                                 }
-                                value={brand || selectedProduct?.brand?.id}
-                                onChange={setBrand}
+                                value={selectedProduct?.brand?.id}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e })}
                             />
                         </Col>
                         <Col span={6}>
                             <NumberInput
-                                value={price || selectedProduct?.price}
-                                onChange={setPrice}
+                                value={selectedProduct?.price}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, price: e })}
                                 label="Price"
                                 placeholder="Price"
                                 required
@@ -254,16 +242,16 @@ const ProductTable = () => {
                         </Col>
                         <Col span={6}>
                             <NumberInput
-                                value={cancelPrice || selectedProduct?.cancel_price}
-                                onChange={setCancelPrice}
+                                value={selectedProduct?.cancel_price}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, cancel_price: e })}
                                 label="Cancel Price"
                                 placeholder="Cancel Price"
                             />
                         </Col>
                         <Col span={12}>
                             <TextInput
-                                value={name || selectedProduct?.name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={selectedProduct?.name}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
                                 label="Product Name"
                                 placeholder="Product Name"
                                 required
@@ -272,16 +260,16 @@ const ProductTable = () => {
 
                         <Col span={12}>
                             <Textarea
-                                value={description || selectedProduct?.description}
-                                onChange={(e) => setDescription(e.target.value)}
+                                value={selectedProduct?.description}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
                                 label="Description"
                                 placeholder="Description"
                             />
                         </Col>
                         <Col span={12}>
-                         
+
                             <Image src={selectedProduct?.image} width={300} height={300} />
-                      
+
                             <FileInput
                                 files={image.files}
                                 onChange={setImage}
@@ -290,14 +278,14 @@ const ProductTable = () => {
                             />
                         </Col>
                         <Col span={12}>
-                                       <Group position="apart">
+                            <Group position="apart">
 
-                            {
-                                selectedProduct?.images.map((image) => (
-                                    <Image src={image.image} width={200} height={200} />
-                                ))
-                            }
-                                  </Group>
+                                {
+                                    selectedProduct?.images.map((image) => (
+                                        <Image src={image.image} width={200} height={200} />
+                                    ))
+                                }
+                            </Group>
                             <FileInput
                                 multiple // Add multiple attribute to enable selecting multiple images
                                 files={additionalImages}
@@ -308,89 +296,96 @@ const ProductTable = () => {
                         </Col>
 
                         <Col span={12}>
-                            <NumberInput value={availableQuantity || selectedProduct?.available_quantity} onChange={setAvailableQuantity} label="Available Quantity" placeholder="Available Quantity" />
+                            <NumberInput value={selectedProduct?.available_quantity}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, available_quantity: e })}
+                                label="Available Quantity" placeholder="Available Quantity" />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">In Stock</Text>
-                            <Checkbox
-                                label="In Stock"
-                                checked={inStock || selectedProduct?.in_stock}
-                                onChange={(event) => setInStock(event.currentTarget.checked)} />
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.in_stock}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, in_stock: e.target.checked })}
+
+                            />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Discount</Text>
-                            <Checkbox
-                                label="Discount"
-                                checked={discount || selectedProduct?.discount}
-                                onChange={(event) => setDiscount(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.discount}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, discount: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">New Arrival</Text>
-                            <Checkbox
-                                label="New Arrival"
-                                checked={newArrival || selectedProduct?.new_arrival}
-                                onChange={(event) => setNewArrival(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.new_arrival}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, new_arrival: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Best Selling Product</Text>
-                            <Checkbox
-                                label="Best Selling Product"
-                                checked={homeProduct}
-                                onChange={(event) => setHomeProduct(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.home_product}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, home_product: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Top Product</Text>
-                            <Checkbox
-                                label="Top Product"
-                                checked={topProduct || selectedProduct?.top_product}
-                                onChange={(event) => setTopProduct(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.top_product}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, top_product: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">New Product</Text>
-                            <Checkbox
-                                label="New Product"
-                                checked={newProduct || selectedProduct?.new_product}
-                                onChange={(event) => setNewProduct(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.new_product}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, new_product: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Show Size</Text>
-                            <Checkbox
-                                label="Show Size"
-                                checked={showSize}
-                                onChange={(event) => setShowSize(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.show_size}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, show_size: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Show Color</Text>
-                            <Checkbox
-                                label="Show Color"
-                                checked={showColor}
-                                onChange={(event) => setShowColor(event.currentTarget.checked)}
+
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.show_color}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, show_color: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">
                                 Show Gender
                             </Text>
-                            <Checkbox
-                                label="Show Gender"
-                                checked={showGender || selectedProduct?.show_gender}
-                                onChange={(event) => setShowGender(event.currentTarget.checked)}
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.show_gender}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, show_gender: e.target.checked })}
                             />
                         </Col>
 
                     </Grid>
 
-                    <Button m="xl"  onClick={handleEditModalClose}>Cancel</Button>
-                    <Button m="xl"   type="submit" color="blue">Update</Button>
+                    <Button m="xl" onClick={handleEditModalClose}>Cancel</Button>
+                    <Button m="xl" type="submit" color="blue">Update</Button>
                 </form>
-           
+
             </Modal>
+
+
 
             <thead>
                 <tr>
