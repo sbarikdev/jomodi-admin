@@ -10,11 +10,11 @@ import { Provider } from 'react-redux';
 import MainRoute from './routers/MainRoute';
 import { Notifications } from '@mantine/notifications';
 import AppHeader from './components/AppHeader';
-
+import { AuthProvider } from './context/auth-context';
 
 function App() {
   return (
-
+    <AuthProvider>
       <Router>
       <Notifications position="top-right" zIndex={2077} />
         <AppHeader />
@@ -22,6 +22,7 @@ function App() {
           <Route path="/*" element={<MainRoute />} />
         </Routes>
       </Router>
+      </AuthProvider>
 
 
   );

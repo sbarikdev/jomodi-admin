@@ -547,7 +547,7 @@ const ProductTable = () => {
                     {(filterProductData).map((product, index) => (
                         <tr key={product.id}>
                             <td>{index + 1}</td>
-                            <td>{product.user?.first_name}</td>
+                            <td>{product.user?.first_name || product?.user?.username}</td>
                             <td>{product.name}</td>
                             <td>{product.price}</td>
                             <td>{product.category.name}</td>

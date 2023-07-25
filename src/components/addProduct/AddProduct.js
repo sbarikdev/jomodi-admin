@@ -21,12 +21,14 @@ import { IconMinus, IconPlus } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 import { Editor, EditorState } from "draft-js";
+import { useAuth } from "../../context/auth-context";
 import "draft-js/dist/Draft.css";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [allCategory, setAllCategory] = useState([]);
   const [allBrand, setAllBrand] = useState([]);
+  const {user} = useAuth()
   // const [image, setImage] = useState({ base64: "", files: [] });
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
@@ -136,6 +138,7 @@ const AddProduct = () => {
     formData.append("new_product", newProduct);
     formData.append("show_size", showSize);
     formData.append("show_color", showColor);
+    formData.append('user', user?.user_id)
 
     axios
       .post(`${API_URL}product/product/`, formData)

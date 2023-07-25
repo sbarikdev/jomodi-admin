@@ -1,9 +1,11 @@
+import React from 'react';
 import { Navbar, Group, Code, ScrollArea, createStyles, rem,
     Box,
     Collapse,
     ThemeIcon,
     Text,
     UnstyledButton,
+    Button,
 
 } from '@mantine/core';
 import {
@@ -18,6 +20,8 @@ import {
 import { UserButton } from './UserButton';
 import { LinksGroup } from './NavbarLinksGroup';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth-context';
+
 // import { Logo } from './Logo';
 
 const mockdata = [
@@ -97,22 +101,40 @@ export default function AppSide() {
     const { classes } = useStyles();
     const navigate = useNavigate();
     const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+    const { isAuthenticated, user, logout, checkauth } = useAuth();
+    const isAdmin = user?.is_admin;
 
+    const [userProfile, setUserProfile] = React.useState(null);
+    const handleLogout = () => {
+        localStorage.removeItem('admin');
+        navigate('/login');
+    };
     return (
-        <Navbar width={{ sm: 300 }} p="md" className={classes.navbar}>
+        <Navbar width={{ sm: 200 }} p="md" className={classes.navbar}>
             <Navbar.Section grow className={classes.links} component={ScrollArea}>
                 
                 <div className={classes.linksInner}>
-                   
+
                     {links}</div>
             </Navbar.Section>
 
             <Navbar.Section className={classes.footer}>
                 <UserButton
                     image="https://images.unsplash.com/photo-1612833609249-5e9a9f8a4b0f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YWRtaW58ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80"
-                    name="Admin"
-                    email="admin@jomodi.com"
+                    name={user?.username}
+                    email={user?.email}
                 />
+                {
+                    isAuthenticated && (
+                        <UnstyledButton onClick={handleLogout}
+                        style={{
+                            marginTop: 20,
+                            marginLeft: 20,
+                        }}
+                        >Logout</UnstyledButton>
+                    )
+                }
+  
             </Navbar.Section>
         </Navbar>
     );
