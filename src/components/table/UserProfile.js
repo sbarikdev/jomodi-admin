@@ -75,7 +75,7 @@ const UserProfile = () => {
 
                                 <Text size="sm" weight={500} color="red">
                                 {
-                                    orderData.filter((order) => order.id == profile.user).length
+                                    orderData.filter((order) => order.user == profile.user).length
                                 }
                             </Text>  
                             </UnstyledButton>

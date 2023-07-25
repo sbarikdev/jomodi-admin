@@ -17,7 +17,7 @@ import {
 } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
-import { IconPlus } from "@tabler/icons-react";
+import { IconMinus, IconPlus } from "@tabler/icons-react";
 import {notifications} from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 
@@ -26,7 +26,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const [allCategory, setAllCategory] = useState([]);
   const [allBrand, setAllBrand] = useState([]);
-  const [image, setImage] = useState({ base64: "", files: [] });
+  // const [image, setImage] = useState({ base64: "", files: [] });
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
   const [name, setName] = useState("");
@@ -36,25 +36,39 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [discount, setDiscount] = useState(false);
   const [newArrival, setNewArrival] = useState(false);
-  const [homeProduct, setHomeProduct] = useState(false);
   const [topProduct, setTopProduct] = useState(false);
   const [newProduct, setNewProduct] = useState(false);
   const [showSize, setShowSize] = useState(false);
   const [showColor, setShowColor] = useState(false);
   const [showGender, setShowGender] = useState(false);
-  const [inStock, setInStock] = useState(false);
   const [additionalImages, setAdditionalImages] = useState([]);
   const [showSizeModal, setShowSizeModal] = useState(false)
   const [showColorModal, setShowColorModal] = useState(false)
   const [sizes, setSizes] = useState('')
   const [colors, setColors] = useState("")
   const [loading, setLoading] = useState(false)
+  const [productImages, setProductImages] = useState([
+    { image: [] }
+  ])
 
 
+  const handleAddProductImageField = () => {
+    setProductImages([...productImages, { image: "" }])
+  }
 
-  const handleImageChange = (files) => {
-    setAdditionalImages(files);
+  const handleRemoveProductImageField = (index) => {
+    const values = [...productImages];
+    values.splice(index, 1);
+    setProductImages(values);
+  }
+
+
+  const handleImageChange = (files, index) => {
+    const updatedProductImages = [...productImages];
+    updatedProductImages[index].image = files;
+    setProductImages(updatedProductImages);
   };
+
 
   useEffect(() => {
     axios
@@ -106,12 +120,10 @@ const AddProduct = () => {
     formData.append("price", price);
     formData.append("cancel_price", cancelPrice);
     formData.append("description", description);
-    formData.append("image", image);
+    formData.append("image", productImages[0].image);
     formData.append("available_quantity", availableQuantity);
-    formData.append("in_stock", inStock);
     formData.append("discount", discount);
-    formData.append("new", newArrival);
-    formData.append("home_product", homeProduct);
+    formData.append("new", newArrival);;
     formData.append("top_product", topProduct);
     formData.append("new_product", newProduct);
     formData.append("show_size", showSize);
@@ -121,10 +133,10 @@ const AddProduct = () => {
       .post(`${API_URL}product/product/`, formData)
       .then((res) => {
         console.log(res);
-        additionalImages.forEach((file) => {
+        productImages.forEach((file) => {
           const formDat = new FormData();
           formDat.append("product", res.data.id);
-          formDat.append("image", file);
+          formDat.append("image", file.image);
           axios.post(`${API_URL}product/product_image/`, formDat);
         });
         sizes.split(',').forEach((item) => {
@@ -155,6 +167,8 @@ const AddProduct = () => {
         alert("Something went wrong");
       });
   };
+
+  console.log(productImages)
 
   return (
     <Container size="sm">
@@ -250,31 +264,44 @@ const AddProduct = () => {
               />
             </Col>
             <Col span={12}>
-              <FileInput
-                files={image.files}
-                onChange={setImage}
-                label="Image"
-                placeholder="Image"
-              />
-            </Col>
-            <Col span={12}>
-              <FileInput
-                multiple // Add multiple attribute to enable selecting multiple images
-                files={additionalImages}
-                onChange={handleImageChange} // Use the handleImageChange function
-                label="Additional Images" // Change the label
-                placeholder="Additional Images"
-              />
+             {
+                productImages.map((item, index) => {
+                  return (
+                    <div>
+                      <FileInput
+                        value={item.image}
+                        onChange={(e) => handleImageChange(e, index)}
+                        label="Images"
+                        placeholder="Additional Images"
+                      />
+                      {
+                        productImages.length > 1 && (
+                          <Button 
+                          mt="sm"
+                          size="xs"
+                          color="red"
+                          onClick={() => handleRemoveProductImageField(index)}>
+                            <IconMinus size={20} />
+                          </Button>
+                        )
+                      }
+                    </div>
+                  )
+                }
+                )
+             }
+             <Group position="right">
+                <Button 
+                  size="xs"
+                color="teal" onClick={handleAddProductImageField}>
+                  <IconPlus size={20} />
+                </Button>
+              </Group>
+             
             </Col>
 
             <Col span={12}>
               <NumberInput value={availableQuantity} onChange={setAvailableQuantity} label="Available Quantity" placeholder="Available Quantity" />
-            </Col>
-            <Col span={4}>
-              <Checkbox
-                label="In Stock"
-                checked={inStock}
-                onChange={(event) => setInStock(event.currentTarget.checked)} />
             </Col>
             <Col span={4}>
               <Checkbox
@@ -291,13 +318,7 @@ const AddProduct = () => {
                 onChange={(event) => setNewArrival(event.currentTarget.checked)}
               />
             </Col>
-            <Col span={4}>
-              <Checkbox
-                label="Best Selling Product"
-                checked={homeProduct}
-                onChange={(event) => setHomeProduct(event.currentTarget.checked)}
-              />
-            </Col>
+    
             <Col span={4}>
               <Checkbox
                 label="Top Product"

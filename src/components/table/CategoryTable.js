@@ -158,9 +158,9 @@ const CategoryTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {categoryData.map((category) => (
+                {categoryData.map((category, index) => (
                     <tr key={category.id}>
-                        <td>{category.id}</td>
+                        <td>{index + 1}</td>
                         <td>{category.name}</td>
                         <td>
                             <Group>

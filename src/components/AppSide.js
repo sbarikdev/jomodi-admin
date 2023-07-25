@@ -34,7 +34,7 @@ const mockdata = [
         ],
     },
     {
-        label: 'Tables',
+        label: 'Store Inventory',
         icon: IconCalendarStats,
         links: [
             { label: 'Products', link: '/product-table' },

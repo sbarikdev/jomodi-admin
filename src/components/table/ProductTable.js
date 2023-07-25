@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
-import { IconEdit, IconEye, IconTrash, IconSearch } from "@tabler/icons-react";
+import { IconEdit, IconEye, IconTrash, IconSearch, IconMinus, IconPlus } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { Checkbox, Tex } from "tabler-icons-react";
 import dayjs from "dayjs";
@@ -38,9 +38,28 @@ const ProductTable = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [allCategory, setAllCategory] = useState([]);
     const [allBrand, setAllBrand] = useState([]);
-    const [image, setImage] = useState({ base64: "", files: [] });
-    const [additionalImages, setAdditionalImages] = useState([]);
     const [search, setSearch] = useState("");
+    const [productImages, setProductImages] = useState([
+        { image: [] }
+    ])
+
+
+    const handleAddProductImageField = () => {
+        setProductImages([...productImages, { image: "" }])
+    }
+
+    const handleRemoveProductImageField = (index) => {
+        const values = [...productImages];
+        values.splice(index, 1);
+        setProductImages(values);
+    }
+
+
+    const handleImageChange = (files, index) => {
+        const updatedProductImages = [...productImages];
+        updatedProductImages[index].image = files;
+        setProductImages(updatedProductImages);
+    };
 
     useEffect(() => {
         axios
@@ -102,10 +121,6 @@ const ProductTable = () => {
     };
 
 
-    const handleImageChange = (files) => {
-        // Function to update the additional images state
-        setAdditionalImages(files);
-    };
     const handleProductDelete = (id) => {
         axios
             .delete(`${API_URL}product/product_detail/${id}/`)
@@ -132,12 +147,31 @@ const ProductTable = () => {
             });
     };
 
+    const isFile = (input) => "File" in window && input instanceof File;
+    console.log(productImages)
+
     const handleProductEdit = () => {
         if (selectedProduct) {
+            const formData = new FormData();
+            formData.append("category", selectedProduct.category);
+            formData.append("brand", selectedProduct.brand);
+            formData.append("name", selectedProduct.name);
+            formData.append("price", selectedProduct.price);
+            formData.append("cancel_price", selectedProduct.cancel_price);
+            formData.append("description", selectedProduct.description);
+            formData.append("available_quantity", selectedProduct.available_quantity);
+            formData.append("discount", selectedProduct.discount);
+            formData.append("new_arrival", selectedProduct.new_arrival);
+            formData.append("top_product", selectedProduct.top_product);
+            formData.append("new_product", selectedProduct.new_product);
+            formData.append("show_size", selectedProduct.show_size);
+            formData.append("show_color", selectedProduct.show_color);
+            formData.append('show_gender', selectedProduct.show_gender)
+
             axios
                 .put(
                     `${API_URL}product/product_detail/${selectedProduct.id}/`,
-                    selectedProduct
+                    formData
                 )
                 .then((res) => {
                     console.log(res.data);
@@ -148,6 +182,15 @@ const ProductTable = () => {
                             product.id === selectedProduct.id ? res.data : product
                         );
                         return updatedProductData;
+                    });
+
+                    // Close the edit modal
+
+                    productImages.forEach((file) => {
+                        const formDat = new FormData();
+                        formDat.append("product", selectedProduct.id);
+                        formDat.append("image", file.image);
+                        axios.post(`${API_URL}product/product_image/`, formDat);
                     });
 
                     handleEditModalClose();
@@ -194,6 +237,7 @@ const ProductTable = () => {
         };
     };
 
+    
     return (
         <Table striped>
             <Modal
@@ -204,7 +248,6 @@ const ProductTable = () => {
             >
                 <Modal.Title>Edit Product</Modal.Title>
 
-                <form onSubmit={handleProductEdit} encType="multipart/form-data">
                     <Grid>
                         <Col span={12}>
                             <Select
@@ -213,10 +256,9 @@ const ProductTable = () => {
                                 data={
                                     allCategoryList
                                 }
+                                defaultValue={selectedProduct?.category?.id}
                                 value={selectedProduct?.category?.id}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, category: e })}
-                            // value={category || selectedProduct?.category?.id}
-                            // onChange={setCategory}
                             />
                         </Col>
                         <Col span={12}>
@@ -227,6 +269,7 @@ const ProductTable = () => {
                                     allBrandList.filter((item) => (item.category.id == selectedProduct?.category))
                                 )
                                 }
+                                defaultValue={selectedProduct?.brand?.id}
                                 value={selectedProduct?.brand?.id}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e })}
                             />
@@ -267,47 +310,55 @@ const ProductTable = () => {
                             />
                         </Col>
                         <Col span={12}>
-
-                            <Image src={selectedProduct?.image} width={300} height={300} />
-
-                            <FileInput
-                                files={image.files}
-                                onChange={setImage}
-                                label="Image"
-                                placeholder="Image"
-                            />
+                            <Group position="right">
+                        {
+                            selectedProduct?.images.map((item, index) => (
+                                <Image width={200} height={80} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
+                            ))
+                        }
+                        </Group>
                         </Col>
+                       
                         <Col span={12}>
-                            <Group position="apart">
-
-                                {
-                                    selectedProduct?.images.map((image) => (
-                                        <Image src={image.image} width={200} height={200} />
-                                    ))
-                                }
-                            </Group>
-                            <FileInput
-                                multiple // Add multiple attribute to enable selecting multiple images
-                                files={additionalImages}
-                                onChange={handleImageChange} // Use the handleImageChange function
-                                label="Additional Images" // Change the label
-                                placeholder="Additional Images"
-                            />
+                        {
+                            productImages.map((item, index) => {
+                                return (
+                                    <div>
+                                        <FileInput
+                                            value={item.image}
+                                            onChange={(e) => handleImageChange(e, index)}
+                                            label="Images"
+                                            placeholder="Additional Images"
+                                        />
+                                        {
+                                            productImages.length > 1 && (
+                                                <Button
+                                                    mt="sm"
+                                                    size="xs"
+                                                    color="red"
+                                                    onClick={() => handleRemoveProductImageField(index)}>
+                                                    <IconMinus size={20} />
+                                                </Button>
+                                            )
+                                        }
+                                    </div>
+                                )
+                            }
+                            )
+                        }
+                        <Group position="right">
+                            <Button
+                                size="xs"
+                                color="teal" onClick={handleAddProductImageField}>
+                                <IconPlus size={20} />
+                            </Button>
+                        </Group>
                         </Col>
 
                         <Col span={12}>
                             <NumberInput value={selectedProduct?.available_quantity}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, available_quantity: e })}
                                 label="Available Quantity" placeholder="Available Quantity" />
-                        </Col>
-                        <Col span={4}>
-                            <Text size="sm">In Stock</Text>
-                            <input
-                                type="checkbox"
-                                checked={selectedProduct?.in_stock}
-                                onChange={(e) => setSelectedProduct({ ...selectedProduct, in_stock: e.target.checked })}
-
-                            />
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Discount</Text>
@@ -323,14 +374,6 @@ const ProductTable = () => {
                                 type="checkbox"
                                 checked={selectedProduct?.new_arrival}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, new_arrival: e.target.checked })}
-                            />
-                        </Col>
-                        <Col span={4}>
-                            <Text size="sm">Best Selling Product</Text>
-                            <input
-                                type="checkbox"
-                                checked={selectedProduct?.home_product}
-                                onChange={(e) => setSelectedProduct({ ...selectedProduct, home_product: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>
@@ -380,8 +423,10 @@ const ProductTable = () => {
                     </Grid>
 
                     <Button m="xl" onClick={handleEditModalClose}>Cancel</Button>
-                    <Button m="xl" type="submit" color="blue">Update</Button>
-                </form>
+                    <Button m="xl" 
+                    onClick={handleProductEdit}
+                    color="blue">Update</Button>
+
 
             </Modal>
 
@@ -399,9 +444,9 @@ const ProductTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {productData.map((product) => (
+                {productData.map((product, index) => (
                     <tr key={product.id}>
-                        <td>{product.id}</td>
+                        <td>{index + 1}</td>
                         <td>{product.name}</td>
                         <td>{product.price}</td>
                         <td>{product.category.name}</td>

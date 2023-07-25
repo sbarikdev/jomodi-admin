@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Select } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -124,20 +124,27 @@ const OrderTable = () => {
 
 
     return (
-        <Table striped>
-            <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" p={30}>
-                <TextInput
+        <Table striped highlightOnHover withColumnBorders>
+            <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" >
+                <Select
+                    data={[
+                        { value: "Shipping In Progress", label: "Shipping In Progress" },
+                        { value: "Shipped", label: "Shipped" },
+                        { value: "Out for Delivery", label: "Out For Delivery" },
+                        { value: "Delivered", label: "Delivered" },
+                        { value: "Cancelled", label: "Cancelled" },
+                        { value: 'Cancel Requested', label: 'Cancel Requested' }
+                    ]}
                     label="Status"
                     placeholder="Status"
                     value={selectedOrder?.status}
-                    onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })}
+                    onChange={(e) => setSelectedOrder({
+                        ...selectedOrder,
+                        status: e, // Update the status value in the selectedOrder object
+                        cancel: e == "Cancelled" ? true : false // Set the cancel property based on the selected value
+                    })}
                 />
-                {
-                    selectedOrder?.cancel && (
-                        <Checkbox label="Cancel"
-                            checked={selectedOrder?.cancel} onChange={(e) => setSelectedOrder({ ...selectedOrder, cancel: e.target.checked })} />
-                    )
-                }
+
 
                 <br />
                 <Text size="sm" weight={500}>
@@ -147,7 +154,7 @@ const OrderTable = () => {
 
                 <Group position="right">
                     <Button onClick={handleUpdateOrder}
-                        style={{ marginTop: rem(10) }}
+                        style={{ marginTop: rem(200) }}
                     >
                         Update
                     </Button>
@@ -158,21 +165,13 @@ const OrderTable = () => {
                 {/* Modal content */}
                 <Group position="apart">
                     <Text size="sm" weight={500}>
-                        ID: {selectedOrder?.id}
+                        Order ID: {selectedOrder?.order_id}
                     </Text>
                     <Text size="sm" weight={500}>
                         Order Date: {dayjs(selectedOrder?.order_date).format("DD-MMMM-YYYY--MM:HH")}
                     </Text>
                 </Group>
-                <br />
-                <Group position="apart">
-                    <Text size="sm" weight={500}>
-                        Order ID: {selectedOrder?.order_id}
-                    </Text>
-                    <Text size="sm" weight={500}>
-                        Total: {selectedOrder?.total}
-                    </Text>
-                </Group>
+
                 <br />
                 <Group position="apart">
                     <Text size="sm" weight={500}>
@@ -217,7 +216,6 @@ const OrderTable = () => {
                     </Text>
                 </Group>
                 <br />
-                <TextInput placeholder="Search" onChange={(e) => setSearch(e.target.value)} />
                 <Table striped>
                     <thead>
                         <tr>
@@ -226,6 +224,7 @@ const OrderTable = () => {
                             <th>Name</th>
                             <th>Price</th>
                             <th>Quantity</th>
+                            <th>Total</th>
                             <th>Cancel</th>
                         </tr>
                     </thead>
@@ -237,6 +236,7 @@ const OrderTable = () => {
                                 <td>{product.name}</td>
                                 <td>{product.price}</td>
                                 <td>{product.quantity}</td>
+                                <td>{product.price * product.quantity}</td>
                                 <td>{product.cancel ? "Yes" : "No"}</td>
                             </tr>
                         ))}
@@ -251,6 +251,7 @@ const OrderTable = () => {
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
+                    <th>Date</th>
                     <th>Phone</th>
                     <th>Address</th>
                     <th>Products</th>
@@ -266,6 +267,9 @@ const OrderTable = () => {
                 {orderData?.map((order, index) => (
                     <tr key={order.id}>
                         <td>{index + 1}</td>
+                        <td>
+                            {dayjs(order.order_date).format("DD/MM/YY")}
+                        </td>
                         <td>{order.first_name} {order.last_naem}</td>
                         <td>{order.user.username}</td>
                         <td>{order.address}</td>
@@ -276,9 +280,9 @@ const OrderTable = () => {
                                         <Text
                                             color={item.cancel ? "red" : "black"}
                                         >{item.name} x {item.quantity} </Text>
-                                        {/* <Text size="sm" weight={400} color="red">
-                                            {item.cancel && "Cancel"}
-                                        </Text> */}
+                                        <Text size="sm" weight={400} color="teal">
+                                            {item.price}
+                                        </Text>
                                     </Group>
                                 ))
 

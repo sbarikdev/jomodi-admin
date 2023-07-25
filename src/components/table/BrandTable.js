@@ -140,9 +140,9 @@ const BrandTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {brandData.map((brand) => (
+                {brandData.map((brand, index) => (
                     <tr key={brand.id}>
-                        <td>{brand.id}</td>
+                        <td>{index + 1}</td>
                         <td>{brand.name}</td>
                         <td>{brand.category.name}</td>
                         <td>

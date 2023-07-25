@@ -121,7 +121,7 @@ export default function Dashboard() {
     {
       title: "Total Pending Order",
       icon: IconDiscount2,
-      value: orders?.filter((item) => item.status.toLowerCase() != "delivered")
+      value: orders?.filter((item) => ((item.cancel == false) && (item.status.toLowerCase() != 'delivered') ))
         .length,
       diff: -30,
       link: "/order-table",
