@@ -14,6 +14,7 @@ const UserProfile = () => {
     const [profileData, setProfileData] = useState([]);
     const [selectedProfile, setSelectedProfile] = useState(null);
     const [orderData, setOrderData] = useState([]);
+    const [filterName, setFilterName] = useState("");
 
     useEffect(() => {
         axios
@@ -40,9 +41,34 @@ const UserProfile = () => {
             });
     }, []);
 
+    const filterData = profileData.filter((item) => {
+        // Check if filterCategory is an array and includes the category ID
+
+        // Check if filterName exists and matches the brand name or category name (case-insensitive)
+        const nameMatch = filterName && (
+            item?.first_name?.toLowerCase().includes(filterName.toLowerCase()) || item?.user?.username.toLowerCase().includes(filterName.toLowerCase())
+            || item?.last_name?.toLowerCase().includes(filterName.toLowerCase()) || item?.address?.toLowerCase().includes(filterName.toLowerCase())
+        );
+
+        // Return true if any of the filter criteria match, otherwise false
+        return nameMatch;
+    });
+
+
+
+    const filteredData = filterData.length ? filterData : profileData;
     
 
     return (
+        <div>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <TextInput
+                    label="Name"
+                    value={filterName}
+                    onChange={(event) => setFilterName(event.currentTarget.value)}
+                    placeholder="Enter name..."
+                />
+            </div>
         <Table striped>
             <thead>
                 <tr>
@@ -61,7 +87,7 @@ const UserProfile = () => {
                 </tr>
             </thead>
             <tbody>
-                {profileData?.map((profile, index) => (
+                {filteredData?.map((profile, index) => (
                     <tr key={index}>
                         <td>{index + 1}</td>
                         <td>{profile.first_name || "Not Added"} {profile.last_naem}</td>
@@ -93,6 +119,7 @@ const UserProfile = () => {
                 ))}
             </tbody>
         </Table>
+        </div>
     );
 };
 
