@@ -40,6 +40,8 @@ const UserProfile = () => {
             });
     }, []);
 
+    
+
     return (
         <Table striped>
             <thead>
@@ -53,6 +55,9 @@ const UserProfile = () => {
                     <th>
                        Number of Order
                     </th>
+                    <th>
+                        Date Joined
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -60,7 +65,7 @@ const UserProfile = () => {
                     <tr key={index}>
                         <td>{index + 1}</td>
                         <td>{profile.first_name || "Not Added"} {profile.last_naem}</td>
-                        <td>{profile.phone_number || "Not Added"} </td>
+                        <td>{profile.user.username || "Not Added"} </td>
                         <td>{profile.address || "Not Added"}</td>
                         <td>
                            {profile.date_of_birth || "Not Added"}
@@ -70,16 +75,19 @@ const UserProfile = () => {
                         </td>
                         <td>
                             <UnstyledButton 
-                            onClick={() => navigate(`/user-order/${profile.user}`) }
+                            onClick={() => navigate(`/user-order/${profile.user.id}`) }
                             >
 
                                 <Text size="sm" weight={500} color="red">
                                 {
-                                    orderData.filter((order) => order.user == profile.user).length
+                                    orderData.filter((order) => order.user == profile.user.id).length
                                 }
                             </Text>  
                             </UnstyledButton>
                           
+                        </td>
+                        <td>
+                            {dayjs(profile.created_at).format("DD/MM/YYYY")}
                         </td>
                     </tr>
                 ))}

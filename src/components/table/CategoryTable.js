@@ -155,6 +155,7 @@ const CategoryTable = () => {
                     <th>ID</th>
                     <th>Name</th>
                     <th>Action</th>
+                    <th>Date Created</th>
                 </tr>
             </thead>
             <tbody>
@@ -184,6 +185,7 @@ const CategoryTable = () => {
                             </Group>
 
                         </td>
+                        <td>{dayjs(category.created_at).format("DD/MM/YYYY")}</td>
                     </tr>
                 ))}
             </tbody>

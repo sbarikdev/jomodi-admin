@@ -35,6 +35,9 @@ const NewsLetter = () => {
                     <th>
                     Email
                     </th>
+                    <th>
+                        Date Created
+                         </th>
                 </tr>
             </thead>
             <tbody>
@@ -42,8 +45,7 @@ const NewsLetter = () => {
                     <tr key={newsletter.id}>
                         <td>{index}</td>
                         <td>{newsletter.email}</td>
-
-                       
+                        <td>{dayjs(newsletter.created_at).format("DD/MM/YYYY")}</td>
                     </tr>
                 ))}
             </tbody>

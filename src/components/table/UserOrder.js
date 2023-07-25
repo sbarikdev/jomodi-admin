@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Select } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -16,6 +16,9 @@ const UserOrder = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openViewModal, setOpenViewModal] = useState(false);
     const [search, setSearch] = useState("");
+    const [filterName, setFilterName] = useState("");
+    const [filterCategory, setFilterCategory] = useState("");
+    const [filterBrand, setFilterBrand] = useState("");
 
 
     const handleEditModal = (order) => {
@@ -108,6 +111,27 @@ const UserOrder = () => {
             });
     };
 
+    const filterData = orderData.filter((item) => {
+        // Extract the category and brand IDs from the products array
+        const productCategories = item.products.map((pro) => pro.category.id);
+        const productBrands = item.products.map((pro) => pro.brand.id);
+
+        // Check if filterCategory and filterBrand are arrays
+        const isFilterCategoryArray = Array.isArray(filterCategory);
+        const isFilterBrandArray = Array.isArray(filterBrand);
+
+        // Check if any of the product categories or brands match the selected filter arrays
+        const categoryMatch = isFilterCategoryArray && filterCategory.some((catId) => productCategories.includes(catId));
+        const brandMatch = isFilterBrandArray && filterBrand.some((brandId) => productBrands.includes(brandId));
+        const nameMatch = item.first_name.toLowerCase().includes(filterName.toLowerCase());
+        const idMatch = item.order_id.toLowerCase().includes(filterName.toLowerCase());
+        // Return true if any of the filter criteria match, otherwise false
+        return categoryMatch || brandMatch || nameMatch || idMatch;
+    });
+
+
+
+    const filterOrderData = filterData?.length ? filterData : orderData;
 
     useEffect(() => {
         axios
@@ -122,24 +146,31 @@ const UserOrder = () => {
             });
     }, [id]);
 
+    
 
 
 
     return (
         <Table striped>
             <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" p={30}>
-                <TextInput
+                <Select
+                    data={[
+                        { value: "Shipping In Progress", label: "Shipping In Progress" },
+                        { value: "Shipped", label: "Shipped" },
+                        { value: "Out for Delivery", label: "Out For Delivery" },
+                        { value: "Delivered", label: "Delivered" },
+                        { value: "Cancelled", label: "Cancelled" },
+                        { value: 'Cancel Requested', label: 'Cancel Requested' }
+                    ]}
                     label="Status"
                     placeholder="Status"
                     value={selectedOrder?.status}
-                    onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })}
+                    onChange={(e) => setSelectedOrder({
+                        ...selectedOrder,
+                        status: e, // Update the status value in the selectedOrder object
+                        cancel: e == "Cancelled" ? true : false // Set the cancel property based on the selected value
+                    })}
                 />
-                {
-                    selectedOrder?.cancel && (
-                        <Checkbox label="Cancel"
-                            checked={selectedOrder?.cancel} onChange={(e) => setSelectedOrder({ ...selectedOrder, cancel: e.target.checked })} />
-                    )
-                }
 
                 <br />
                 <Text size="sm" weight={500}>
@@ -149,7 +180,7 @@ const UserOrder = () => {
 
                 <Group position="right">
                     <Button onClick={handleUpdateOrder}
-                        style={{ marginTop: rem(10) }}
+                        style={{ marginTop: rem(150) }}
                     >
                         Update
                     </Button>
@@ -252,6 +283,7 @@ const UserOrder = () => {
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Date</th>
                     <th>Name</th>
                     <th>Phone</th>
                     <th>Address</th>
@@ -268,6 +300,7 @@ const UserOrder = () => {
                 {orderData?.map((order, index) => (
                     <tr key={order.id}>
                         <td>{index + 1}</td>
+                        <td>{dayjs(order.order_date).format("DD-MMMM-YYYY")}</td>
                         <td>{order.first_name} {order.last_naem}</td>
                         <td>{order.user.username}</td>
                         <td>{order.address}</td>

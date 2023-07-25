@@ -13,14 +13,15 @@ import {
   Select,
   NumberInput,
   Modal,
-  UnstyledButton, Text, Group, Loader
+  UnstyledButton, Text, Group, Loader, MultiSelect
 } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
-import {notifications} from "@mantine/notifications";
+import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
-
+import { Editor, EditorState } from "draft-js";
+import "draft-js/dist/Draft.css";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -51,7 +52,14 @@ const AddProduct = () => {
     { image: [] }
   ])
 
+  const [editorState, setEditorState] = React.useState(() =>
+    EditorState.createEmpty()
+  );
 
+  const editor = React.useRef(null);
+  function focusEditor() {
+    editor.current.focus();
+  }
   const handleAddProductImageField = () => {
     setProductImages([...productImages, { image: "" }])
   }
@@ -168,7 +176,7 @@ const AddProduct = () => {
       });
   };
 
-  console.log(productImages)
+  console.log(colors);
 
   return (
     <Container size="sm">
@@ -185,18 +193,30 @@ const AddProduct = () => {
         </Modal.Body>
         <Button onClick={() => setShowSizeModal(false)}>Save</Button>
       </Modal>
-      <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md">
-        <Modal.Header>Add Color </Modal.Header>
-        <Modal.Body>
-          <TextInput
-            label="Product Color"
-            placeholder="Enter Color"
-            value={colors}
-            onChange={(e) => setColors(e.target.value)
-            }
-          />
-        </Modal.Body>
-        <Button onClick={() => setShowColorModal(false)}>Save </Button>
+      <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md" height={500}>
+        <MultiSelect
+          data={[
+            { value: "red", label: "Red" },
+            { value: "blue", label: "Blue" },
+            { value: "green", label: "Green" },
+            { value: "yellow", label: "Yellow" },
+            { value: "black", label: "Black" },
+            { value: "white", label: "White" },
+            { value: "pink", label: "Pink" },
+            { value: "purple", label: "Purple" },
+            { value: "orange", label: "Orange" },
+            { value: "brown", label: "Brown" },
+            { value: "gray", label: "Gray" },
+            { value: "silver", label: "Silver" },
+            { value: "gold", label: "Gold" },
+          ]}
+          label="Product Color"
+          placeholder="Enter Color"
+          value={colors}
+          onChange={setColors
+          }
+        />
+        <Button onClick={() => setShowColorModal(false)} mt={300}>Save </Button>
       </Modal>
       <h1>Add Product</h1>
       {
@@ -229,6 +249,7 @@ const AddProduct = () => {
                 onChange={setBrand}
               />
             </Col>
+            
             <Col span={6}>
               <NumberInput
                 value={price}
@@ -264,7 +285,7 @@ const AddProduct = () => {
               />
             </Col>
             <Col span={12}>
-             {
+              {
                 productImages.map((item, index) => {
                   return (
                     <div>
@@ -276,11 +297,11 @@ const AddProduct = () => {
                       />
                       {
                         productImages.length > 1 && (
-                          <Button 
-                          mt="sm"
-                          size="xs"
-                          color="red"
-                          onClick={() => handleRemoveProductImageField(index)}>
+                          <Button
+                            mt="sm"
+                            size="xs"
+                            color="red"
+                            onClick={() => handleRemoveProductImageField(index)}>
                             <IconMinus size={20} />
                           </Button>
                         )
@@ -289,15 +310,15 @@ const AddProduct = () => {
                   )
                 }
                 )
-             }
-             <Group position="right">
-                <Button 
+              }
+              <Group position="right">
+                <Button
                   size="xs"
-                color="teal" onClick={handleAddProductImageField}>
+                  color="teal" onClick={handleAddProductImageField}>
                   <IconPlus size={20} />
                 </Button>
               </Group>
-             
+
             </Col>
 
             <Col span={12}>
@@ -318,7 +339,7 @@ const AddProduct = () => {
                 onChange={(event) => setNewArrival(event.currentTarget.checked)}
               />
             </Col>
-    
+
             <Col span={4}>
               <Checkbox
                 label="Top Product"
@@ -372,11 +393,12 @@ const AddProduct = () => {
               }
               <Group mt="sm" position="left">
                 {
-                  colors.split(',').map((item) => {
-                    return (
-                      <Text>{item}</Text>
-                    )
-                  })
+                  colors && colors?.map((item) =>
+                  (
+                    <Text>{item}</Text>
+                  )
+                  )
+
                 }
               </Group>
             </Col>
@@ -392,8 +414,8 @@ const AddProduct = () => {
 
 
           <Button mt="xl" type="submit" color="blue"
-          loading={loading}
-          disabled={loading}
+            loading={loading}
+            disabled={loading}
           >
             Add Product
           </Button>

@@ -9,8 +9,9 @@ import {
     UnstyledButton,
     Modal,
     TextInput,
+    MultiSelect,
 } from "@mantine/core";
-import axios from "axios";
+import axios, { all } from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
 import { IconEdit, IconEye, IconTrash, IconSearch, IconMinus, IconPlus } from "@tabler/icons-react";
@@ -29,6 +30,7 @@ import {
     NumberInput,
     Image,
 } from "@mantine/core";
+import FilterDiv from "../FilterDiv";
 
 
 const ProductTable = () => {
@@ -42,6 +44,11 @@ const ProductTable = () => {
     const [productImages, setProductImages] = useState([
         { image: [] }
     ])
+    const  [filterName, setFilterName] = useState("");
+    const [filterCategory, setFilterCategory] = useState("");
+    const [filterBrand, setFilterBrand] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
+
 
 
     const handleAddProductImageField = () => {
@@ -91,6 +98,41 @@ const ProductTable = () => {
             label: item.name,
         };
     });
+
+    const removeProductImage = (id) => {
+        axios
+            .delete(`${API_URL}product/product_image/${id}/`)
+            .then((res) => {
+                console.log(res.data);
+                notifications.show({
+                    title: "Product Image Deleted",
+                    message: "Product Image Deleted Successfully",
+                    color: "white",
+                    styles: (theme) => ({
+                        root: {
+                            backgroundColor: theme.colors.red[0],
+                            borderColor: theme.colors.red[6],
+                            "&::before": { backgroundColor: theme.white },
+                        },
+                    }),
+                });
+
+                // Update the selectedProduct state to remove the deleted image
+                setSelectedProduct((prevSelectedProduct) => ({
+                    ...prevSelectedProduct,
+                    images: prevSelectedProduct.images.filter((image) => image.id !== id),
+                }));
+
+                // Update the productData state to remove the deleted product
+                setProductData((prevProductData) =>
+                    prevProductData.filter((product) => product.id !== selectedProduct.id)
+                );
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
 
     const allBrandList = allBrand?.map((item) => {
         return {
@@ -236,17 +278,67 @@ const ProductTable = () => {
             }));
         };
     };
+    // useEffect to handle filtering when filter criteria change
+    // const filterData = productData.filter((item) => {
+    //     return (
+    //         filterCategory.includes(item.category.id) ||
+    //         filterBrand.includes(item.brand.id) ||
+    //         item.name.toLowerCase().includes(filterName.toLowerCase()) ||
+    //         item.category.name.toLowerCase().includes(filterName.toLowerCase()) ||
+    //         item.brand.name.toLowerCase().includes(filterName.toLowerCase())
+    //     );
+    // });
 
-    
+    const filterData = productData.filter((item) => {
+        // Check if filterCategory is an array and includes the category ID
+        const categoryMatch = Array.isArray(filterCategory) && filterCategory.includes(item.category.id);
+        const brandMatch = Array.isArray(filterBrand) && filterBrand.includes(item.brand.id);
+
+        // Check if filterName exists and matches the brand name or category name (case-insensitive)
+        const nameMatch = filterName && (
+            item.name.toLowerCase().includes(filterName.toLowerCase()) ||
+            (item.category && item.category.name.toLowerCase().includes(filterName.toLowerCase()))
+        );
+
+        // Return true if any of the filter criteria match, otherwise false
+        return categoryMatch || nameMatch || brandMatch;
+    });
+
+
+    const filterProductData = filterData?.length ? filterData : productData;
+
     return (
-        <Table striped>
-            <Modal
-                opened={editModalOpen}
-                onClose={handleEditModalClose}
-                size="70%"
-                padding="md"
-            >
-                <Modal.Title>Edit Product</Modal.Title>
+        <div>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <TextInput
+                    label="Name"
+                    value={filterName}
+                    onChange={(event) => setFilterName(event.currentTarget.value)}
+                    placeholder="Enter name..."
+                />
+                <MultiSelect
+                    label="Category"
+                    placeholder="Select category"
+                    value={filterCategory}
+                    onChange={(value) => setFilterCategory(value)}
+                    data={allCategoryList}
+                />
+                <MultiSelect
+                    label="Brand"
+                    placeholder="Select brand"
+                    value={filterBrand}
+                    onChange={(value) => setFilterBrand(value)}
+                    data={allBrandList}
+                />
+            </div>
+            <Table striped>
+                <Modal
+                    opened={editModalOpen}
+                    onClose={handleEditModalClose}
+                    size="70%"
+                    padding="md"
+                >
+                    <Modal.Title>Edit Product</Modal.Title>
 
                     <Grid>
                         <Col span={12}>
@@ -309,50 +401,56 @@ const ProductTable = () => {
                                 placeholder="Description"
                             />
                         </Col>
+
                         <Col span={12}>
-                            <Group position="right">
-                        {
-                            selectedProduct?.images.map((item, index) => (
-                                <Image width={200} height={80} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
-                            ))
-                        }
-                        </Group>
+                            <Group position="apart">
+                                {
+                                    selectedProduct?.images.map((item, index) => (
+                                        <Group>
+                                            <Button size={20} color="teal" onClick={() => removeProductImage(item.id)}>
+                                                <IconTrash size={15} />
+                                            </Button>
+                                            <Image width={200} height={80} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
+                                        </Group>
+                                    ))
+                                }
+                            </Group>
                         </Col>
-                       
+
                         <Col span={12}>
-                        {
-                            productImages.map((item, index) => {
-                                return (
-                                    <div>
-                                        <FileInput
-                                            value={item.image}
-                                            onChange={(e) => handleImageChange(e, index)}
-                                            label="Images"
-                                            placeholder="Additional Images"
-                                        />
-                                        {
-                                            productImages.length > 1 && (
-                                                <Button
-                                                    mt="sm"
-                                                    size="xs"
-                                                    color="red"
-                                                    onClick={() => handleRemoveProductImageField(index)}>
-                                                    <IconMinus size={20} />
-                                                </Button>
-                                            )
-                                        }
-                                    </div>
+                            {
+                                productImages.map((item, index) => {
+                                    return (
+                                        <div>
+                                            <FileInput
+                                                value={item.image}
+                                                onChange={(e) => handleImageChange(e, index)}
+                                                label="Images"
+                                                placeholder="Additional Images"
+                                            />
+                                            {
+                                                productImages.length > 1 && (
+                                                    <Button
+                                                        mt="sm"
+                                                        size="xs"
+                                                        color="red"
+                                                        onClick={() => handleRemoveProductImageField(index)}>
+                                                        <IconMinus size={20} />
+                                                    </Button>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
                                 )
                             }
-                            )
-                        }
-                        <Group position="right">
-                            <Button
-                                size="xs"
-                                color="teal" onClick={handleAddProductImageField}>
-                                <IconPlus size={20} />
-                            </Button>
-                        </Group>
+                            <Group position="right">
+                                <Button
+                                    size="xs"
+                                    color="teal" onClick={handleAddProductImageField}>
+                                    <IconPlus size={20} />
+                                </Button>
+                            </Group>
                         </Col>
 
                         <Col span={12}>
@@ -423,62 +521,69 @@ const ProductTable = () => {
                     </Grid>
 
                     <Button m="xl" onClick={handleEditModalClose}>Cancel</Button>
-                    <Button m="xl" 
-                    onClick={handleProductEdit}
-                    color="blue">Update</Button>
+                    <Button m="xl"
+                        onClick={handleProductEdit}
+                        color="blue">Update</Button>
 
 
-            </Modal>
+                </Modal>
 
 
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th>Brand</th>
-                    <th>In Stock</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {productData.map((product, index) => (
-                    <tr key={product.id}>
-                        <td>{index + 1}</td>
-                        <td>{product.name}</td>
-                        <td>{product.price}</td>
-                        <td>{product.category.name}</td>
-                        <td>{product.brand.name}</td>
-                        <td>{product.inStock ? "Yes" : "No"}</td>
-                        <td>
-                            <Group>
-                                <IconEdit onClick={() => handleEditModal(product)} size={24} />
-                                <Menu shadow="md" width={200}>
-                                    <Menu.Target>
-                                        <IconTrash size={24} />
-                                    </Menu.Target>
-                                    <Menu.Dropdown>
-                                        <Menu.Label>Delete this Order</Menu.Label>
-                                        <Group>
-                                            <Menu.Item
-                                                onClick={() => handleProductDelete(product.id)}
-                                            >
-                                                Yes
-                                            </Menu.Item>
-                                            <Menu.Item>No</Menu.Item>
-                                        </Group>
-                                    </Menu.Dropdown>
-                                </Menu>
-
-                                <IconEye onClick={() => handleEditModal(product)} size={24} />
-                            </Group>
-                        </td>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Added By</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>In Stock</th>
+                        <th>Action</th>
+                        <th>Date Added</th>
                     </tr>
-                ))}
-            </tbody>
-        </Table>
+                </thead>
+                <tbody>
+                    {(filterProductData).map((product, index) => (
+                        <tr key={product.id}>
+                            <td>{index + 1}</td>
+                            <td>{product.user?.first_name}</td>
+                            <td>{product.name}</td>
+                            <td>{product.price}</td>
+                            <td>{product.category.name}</td>
+                            <td>{product.brand.name}</td>
+                            <td>{product.inStock ? "Yes" : "No"}</td>
+                            <td>
+                                <Group>
+                                    <IconEdit onClick={() => handleEditModal(product)} size={24} />
+                                    <Menu shadow="md" width={200}>
+                                        <Menu.Target>
+                                            <IconTrash size={24} />
+                                        </Menu.Target>
+                                        <Menu.Dropdown>
+                                            <Menu.Label>Delete this Order</Menu.Label>
+                                            <Group>
+                                                <Menu.Item
+                                                    onClick={() => handleProductDelete(product.id)}
+                                                >
+                                                    Yes
+                                                </Menu.Item>
+                                                <Menu.Item>No</Menu.Item>
+                                            </Group>
+                                        </Menu.Dropdown>
+                                    </Menu>
+
+                                    <IconEye onClick={() => handleEditModal(product)} size={24} />
+                                </Group>
+                            </td>
+                            <td>{dayjs(product.created_at).format("DD/MM/YYYY")}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+
+        </div>
+
     );
 };
 

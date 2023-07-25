@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, MultiSelect } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -15,6 +15,8 @@ const BrandTable = () => {
     const [selectBrand, setSelectBrand] = useState(null);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [filterName, setFilterName] = useState("");
+    const [filterCategory, setFilterCategory] = useState([]);
 
     const handleEditModal = (brand) => {
         setSelectBrand(brand);
@@ -99,7 +101,60 @@ const BrandTable = () => {
     }, []);
 
 
+    const handleFilter = () => {
+        console.log(filterCategory);
+    }
+    const uniqueCategoryIds = new Set();
+
+    const allCategoryList = brandData.reduce((acc, brand) => {
+        // Check if the category ID is already present in the Set
+        if (!uniqueCategoryIds.has(brand.category.id)) {
+            // Add the category ID to the Set
+            uniqueCategoryIds.add(brand.category.id);
+            // Push the category object into the accumulator array
+            acc.push({
+                label: brand.category.name,
+                value: brand.category.id,
+            });
+        }
+        return acc;
+    }, []);
+
+    const filterData = brandData.filter((item) => {
+        // Check if filterCategory is an array and includes the category ID
+        const categoryMatch = Array.isArray(filterCategory) && filterCategory.includes(item.category.id);
+
+        // Check if filterName exists and matches the brand name or category name (case-insensitive)
+        const nameMatch = filterName && (
+            item.name.toLowerCase().includes(filterName.toLowerCase()) ||
+            (item.category && item.category.name.toLowerCase().includes(filterName.toLowerCase()))
+        );
+
+        // Return true if any of the filter criteria match, otherwise false
+        return categoryMatch || nameMatch;
+    });
+
+
+
+    const filteredData = filterData.length ? filterData : brandData;
+
     return (
+        <div>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <TextInput
+                    label="Name"
+                    value={filterName}
+                    onChange={(event) => setFilterName(event.currentTarget.value)}
+                    placeholder="Enter name..."
+                />
+                <MultiSelect
+                    label="Category"
+                    placeholder="Select category"
+                    value={filterCategory}
+                    onChange={(value) => setFilterCategory(value)}
+                    data={allCategoryList}
+                />
+            </div>
         <Table striped>
             <Modal opened={editModalOpen} onClose={handleEditModalClose} size="md">
                 <Modal.Header>Update Brand</Modal.Header>
@@ -137,10 +192,11 @@ const BrandTable = () => {
                         Category
                     </th>
                     <th>Action</th>
+                    <th>Date Created</th>
                 </tr>
             </thead>
             <tbody>
-                {brandData.map((brand, index) => (
+                {filteredData.map((brand, index) => (
                     <tr key={brand.id}>
                         <td>{index + 1}</td>
                         <td>{brand.name}</td>
@@ -167,10 +223,12 @@ const BrandTable = () => {
                             </Group>
 
                         </td>
+                        <td>{dayjs(brand.created_at).format("DD/MM/YYYY")}</td>
                     </tr>
                 ))}
             </tbody>
         </Table>
+        </div>
     );
 };
 
