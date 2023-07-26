@@ -195,12 +195,16 @@ const ProductTable = () => {
     };
 
     const isFile = (input) => "File" in window && input instanceof File;
+    console.log(selectedProduct)
 
     const handleProductEdit = () => {
         if (selectedProduct) {
             const formData = new FormData();
-            formData.append("category", selectedProduct.category);
-            formData.append("brand", selectedProduct.brand);
+            selectedProduct?.category && formData.append("category", selectedProduct.category.id);
+            selectedProduct?.brand && formData.append("brand", selectedProduct.brand.id);
+            // formData.append("category", selectedProduct.category);
+            // formData.append("brand", selectedProduct.brand);
+            productImages && formData.append("image", productImages[0].image);
             formData.append("name", selectedProduct.name);
             formData.append("price", selectedProduct.price);
             formData.append("cancel_price", selectedProduct.cancel_price);
@@ -213,8 +217,6 @@ const ProductTable = () => {
             formData.append("show_size", selectedProduct.show_size);
             formData.append("show_color", selectedProduct.show_color);
             formData.append('show_gender', selectedProduct.show_gender)
-
-
 
             axios
                 .patch(
@@ -233,16 +235,6 @@ const ProductTable = () => {
                             console.log(res.data.results);
                             setProductData(res.data.results);
                         })
-
-                    // Update productData state with the updated product
-                    // setProductData((prevProductData) => {
-                    //     const updatedProductData = prevProductData?.map((product) =>
-                    //         product.id == selectedProduct.id ? res.data : product
-                    //     );
-                    //     return updatedProductData;
-                    // });
-
-                    // Close the edit modal
 
                     productImages?.forEach((file) => {
                         const formDat = new FormData();
