@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Pagination } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -13,6 +13,8 @@ const NewsLetter = () => {
 
     const [newsData, setNewsData] = useState([]);
 
+
+
     useEffect(() => {
         axios
             .get(`${API_URL}newsletter/newsletter/`)
@@ -25,9 +27,26 @@ const NewsLetter = () => {
             });
     }, []);
 
+    const [page, setPage] = useState(1);
+
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(newsData?.length / itemsPerPage)
+
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const paginatedItems = (
+        newsData?.slice(
+            (page - 1) * itemsPerPage,
+            page * itemsPerPage)
+    )
    
     return (
-        <Table striped>
+        <div>
+<Table striped>
            
             <thead>
                 <tr>
@@ -41,7 +60,7 @@ const NewsLetter = () => {
                 </tr>
             </thead>
             <tbody>
-                {newsData.map((newsletter, index) => (
+                {paginatedItems.map((newsletter, index) => (
                     <tr key={newsletter.id}>
                         <td>{index}</td>
                         <td>{newsletter.email}</td>
@@ -50,6 +69,18 @@ const NewsLetter = () => {
                 ))}
             </tbody>
         </Table>
+            <Group spacing={5} position="right">
+                <Pagination my="lg" total={totalPages}
+                    value={page}
+                    onChange={handlePageChange} color="red"
+                    style={{
+                        display: 'flex',
+                        fontSize: '1.6rem',
+                    }}
+                />
+            </Group>
+        </div>
+        
     );
 };
 

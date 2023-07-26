@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, MultiSelect } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, MultiSelect, Pagination } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ const BrandTable = () => {
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [filterName, setFilterName] = useState("");
     const [filterCategory, setFilterCategory] = useState([]);
+
 
     const handleEditModal = (brand) => {
         setSelectBrand(brand);
@@ -61,7 +62,7 @@ const BrandTable = () => {
         axios
             .put(`${API_URL}category/brand/${id}/`, {
                 name: selectBrand.name,
-                category: selectBrand.category,
+                category: selectBrand.category.id,
             })
             .then((res) => {
                 console.log(res.data);
@@ -138,6 +139,23 @@ const BrandTable = () => {
 
     const filteredData = filterData.length ? filterData : brandData;
 
+    const [page, setPage] = useState(1);
+
+    const itemsPerPage = 10;
+
+    const totalPages =  Math.ceil(filteredData?.length / itemsPerPage)
+
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const paginatedItems = (
+        filteredData?.slice(
+            (page - 1) * itemsPerPage,
+            page * itemsPerPage)
+    )
+
     return (
         <div
         style={{
@@ -175,7 +193,7 @@ const BrandTable = () => {
                         }
                     />
                     
-                        <Select
+                        {/* <Select
                             label="Category"
                             value={selectBrand?.category?.id} // Use the ID of the selected category as the value
                             onChange={(e) =>
@@ -184,7 +202,7 @@ const BrandTable = () => {
                                 })
                             }
                             data={allCategoryList}
-                        />
+                        /> */}
 
                 </Modal.Body>
                 <Button onClick={() => handleBrandUpdate(selectBrand.id)}>Update</Button>
@@ -213,7 +231,7 @@ const BrandTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {filteredData.map((brand, index) => (
+                {paginatedItems.map((brand, index) => (
                     <tr key={brand.id}>
                         <td>{index + 1}</td>
                         <td>{brand?.name}</td>
@@ -246,6 +264,16 @@ const BrandTable = () => {
                 ))}
             </tbody>
         </Table>
+            <Group spacing={5} position="right">
+                <Pagination my="lg" total={totalPages}
+                    value={page}
+                    onChange={handlePageChange} color="red"
+                    style={{
+                        display: 'flex',
+                        fontSize: '1.6rem',
+                    }}
+                />
+            </Group>
         </div>
     );
 };

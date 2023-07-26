@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Pagination } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -57,6 +57,24 @@ const UserProfile = () => {
 
 
     const filteredData = filterData.length ? filterData : profileData;
+
+    const [page, setPage] = useState(1);
+
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage)
+
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const paginatedItems = (
+        filteredData?.slice(
+            (page - 1) * itemsPerPage,
+            page * itemsPerPage)
+    )
+
     
 
     return (
@@ -91,7 +109,7 @@ const UserProfile = () => {
                 </tr>
             </thead>
             <tbody>
-                {filteredData?.map((profile, index) => (
+                {paginatedItems?.map((profile, index) => (
                     <tr key={index}>
                         <td>{index + 1}</td>
                         <td>{profile.first_name || "Not Added"} {profile.last_naem}</td>
@@ -123,6 +141,16 @@ const UserProfile = () => {
                 ))}
             </tbody>
         </Table>
+            <Group spacing={5} position="right">
+                <Pagination my="lg" total={totalPages}
+                    value={page}
+                    onChange={handlePageChange} color="red"
+                    style={{
+                        display: 'flex',
+                        fontSize: '1.6rem',
+                    }}
+                />
+            </Group>
         </div>
     );
 };

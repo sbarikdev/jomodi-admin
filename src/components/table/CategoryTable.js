@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Pagination } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
@@ -82,7 +82,22 @@ const CategoryTable = () => {
             });
     };
 
+    const [page, setPage] = useState(1);
 
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(categoryData?.length / itemsPerPage)
+
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const paginatedItems = (
+        categoryData?.slice(
+            (page - 1) * itemsPerPage,
+            page * itemsPerPage)
+    )
 
 
     useEffect(() => {
@@ -101,6 +116,7 @@ const CategoryTable = () => {
 
 
     return (
+        <div>
         <Table striped style={{
             backgroundColor: 'white',
         }}>
@@ -162,7 +178,7 @@ const CategoryTable = () => {
                 </tr>
             </thead>
             <tbody>
-                {categoryData.map((category, index) => (
+                {paginatedItems?.map((category, index) => (
                     <tr key={category.id}>
                         <td>{index + 1}</td>
                         <td>{category.name}</td>
@@ -194,6 +210,17 @@ const CategoryTable = () => {
                 ))}
             </tbody>
         </Table>
+         <Group spacing={5} position="right">
+                <Pagination my="lg" total={totalPages}
+                  value={page}
+                  onChange={handlePageChange} color="red"
+                  style={{
+                    display: 'flex',
+                    fontSize: '1.6rem',
+                  }}
+                />
+              </Group>
+        </div>
     );
 };
 

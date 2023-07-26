@@ -94,7 +94,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     axios
-      .get(`${API_URL}category/brand/`)
+      .get(`${API_URL}category/brand-detail/`)
       .then((res) => {
         console.log(res.data.results);
         setAllBrand(res.data.results);

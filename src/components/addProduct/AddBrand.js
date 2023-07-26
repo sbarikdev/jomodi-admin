@@ -14,6 +14,7 @@ import {
 } from '@mantine/core';
 import axios from 'axios';
 import { API_URL } from '../../constant';
+import { notifications } from '@mantine/notifications';
 
 function AddBrand() {
     const [category, setCategory] = useState('');
@@ -40,23 +41,33 @@ function AddBrand() {
             label: item.name,
         };
     });
-
+    const isFile = (input) => "File" in window && input instanceof File;
     const handleSubmit = (e) => {
         e.preventDefault();
         const formData = new FormData();
         formData.append('category', category);
         formData.append('name', brand);
         formData.append('description', description);
-        formData.append('image', image);
+        isFile(image) && formData.append('image', image);
         axios
             .post(`${API_URL}category/brand/`, formData)
             .then((res) => {
                 console.log(res);
-                alert('Brand Added Successfully');
+                notifications.show({
+                    title: 'Brand Added',
+                    message: 'Brand Added Successfully',
+                    color: 'green',
+                    autoClose: 5000,
+                });
             })
             .catch((err) => {
                 console.log(err);
-                alert('Something went wrong');
+                notifications.show({
+                    title: 'Something went wrong',
+                    message: 'Something went wrong',
+                    color: 'red',
+                    autoClose: 5000,
+                });
             });
     };
 

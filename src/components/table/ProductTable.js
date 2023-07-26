@@ -10,6 +10,7 @@ import {
     Modal,
     TextInput,
     MultiSelect,
+    Pagination
 } from "@mantine/core";
 import axios, { all } from "axios";
 import { API_URL } from "../../constant";
@@ -82,7 +83,7 @@ const ProductTable = () => {
 
     useEffect(() => {
         axios
-            .get(`${API_URL}category/brand/`)
+            .get(`${API_URL}category/brand-detail/`)
             .then((res) => {
                 console.log(res.data.results);
                 setAllBrand(res.data.results);
@@ -225,7 +226,7 @@ const ProductTable = () => {
                     // Update productData state with the updated product
                     setProductData((prevProductData) => {
                         const updatedProductData = prevProductData?.map((product) =>
-                            product.id === selectedProduct.id ? res.data : product
+                            product.id == selectedProduct.id ? res.data : product
                         );
                         return updatedProductData;
                     });
@@ -313,6 +314,23 @@ const ProductTable = () => {
 
 
     const filterProductData = filterData?.length ? filterData : productData;
+
+    const [page, setPage] = useState(1);
+
+    const itemsPerPage = 10;
+
+    const totalPages = Math.ceil(filterProductData?.length / itemsPerPage)
+
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const paginatedItems = (
+        filterProductData?.slice(
+            (page - 1) * itemsPerPage,
+            page * itemsPerPage)
+    )
 
     return (
         <div style={{
@@ -554,7 +572,7 @@ const ProductTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {(filterProductData).map((product, index) => (
+                    {(paginatedItems).map((product, index) => (
                         <tr key={product.id}>
                             <td>{index + 1}</td>
                             <td>{product.user?.first_name || product?.user?.username}</td>
@@ -592,6 +610,16 @@ const ProductTable = () => {
                     ))}
                 </tbody>
             </Table>
+            <Group spacing={5} position="right">
+                <Pagination my="lg" total={totalPages}
+                    value={page}
+                    onChange={handlePageChange} color="red"
+                    style={{
+                        display: 'flex',
+                        fontSize: '1.6rem',
+                    }}
+                />
+            </Group>
 
         </div>
 
