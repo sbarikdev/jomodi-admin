@@ -364,7 +364,7 @@ const OrderTable = () => {
                                     <td>{product.name}</td>
                                     <td>₹{product.price}</td>
                                     <td>{product.quantity}</td>
-                                    <td>{product.price * product.quantity}</td>
+                                    <td>₹{product.price * product.quantity}</td>
                                     <td>{product.cancel ? "Yes" : "No"}</td>
                                 </tr>
                             ))}
