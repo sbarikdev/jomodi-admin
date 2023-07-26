@@ -54,6 +54,7 @@ function AddBanner() {
   return (
     <Container size="sm">
       <Card shadow="sm">
+        <h1>Change Banner</h1>
         <form encType="form-data">
           <Grid>
             {

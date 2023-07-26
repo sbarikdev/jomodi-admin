@@ -74,6 +74,7 @@ function AddBrand() {
     return (
         <Container size="sm">
             <Card shadow="sm">
+                <h1>Add Brand</h1>
                 <form onSubmit={handleSubmit} encType="multipart/form-data">
                     <Grid>
                         <Col span={12}>

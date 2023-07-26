@@ -22,7 +22,7 @@ import PrivateRoute from './PrivateRoute';
 import { useAuth } from '../context/auth-context';
 
 function MainRoute() {
-    const isAuthenticated = localStorage.getItem('admin');
+    const isAuthenticated = localStorage.getItem('authenticated');
     const wrapPrivateRoute = (element, user) => {
         return (
             <PrivateRoute user={user}>

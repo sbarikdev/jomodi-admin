@@ -45,7 +45,7 @@ const ProductTable = () => {
     const [productImages, setProductImages] = useState([
         { image: [] }
     ])
-    const  [filterName, setFilterName] = useState("");
+    const [filterName, setFilterName] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
     const [filterBrand, setFilterBrand] = useState("");
     const [filteredData, setFilteredData] = useState([]);
@@ -117,6 +117,10 @@ const ProductTable = () => {
                         },
                     }),
                 });
+
+                axios.get(
+
+                )
 
                 // Update the selectedProduct state to remove the deleted image
                 setSelectedProduct((prevSelectedProduct) => ({
@@ -191,7 +195,6 @@ const ProductTable = () => {
     };
 
     const isFile = (input) => "File" in window && input instanceof File;
-    console.log(productImages)
 
     const handleProductEdit = () => {
         if (selectedProduct) {
@@ -211,8 +214,7 @@ const ProductTable = () => {
             formData.append("show_color", selectedProduct.show_color);
             formData.append('show_gender', selectedProduct.show_gender)
 
-            console.log(selectedProduct)
-        
+
 
             axios
                 .patch(
@@ -220,16 +222,25 @@ const ProductTable = () => {
                     formData
                 )
                 .then((res) => {
+                    console.log("jere")
                     console.log(res.data);
-                    console.log(formData)  
+
+                    console.log(formData)
+
+                    axios
+                        .get(`${API_URL}product/product_detail/`)
+                        .then((res) => {
+                            console.log(res.data.results);
+                            setProductData(res.data.results);
+                        })
 
                     // Update productData state with the updated product
-                    setProductData((prevProductData) => {
-                        const updatedProductData = prevProductData?.map((product) =>
-                            product.id == selectedProduct.id ? res.data : product
-                        );
-                        return updatedProductData;
-                    });
+                    // setProductData((prevProductData) => {
+                    //     const updatedProductData = prevProductData?.map((product) =>
+                    //         product.id == selectedProduct.id ? res.data : product
+                    //     );
+                    //     return updatedProductData;
+                    // });
 
                     // Close the edit modal
 
@@ -240,7 +251,7 @@ const ProductTable = () => {
                             formDat.append("image", file.image);
                             axios.post(`${API_URL}product/product_image/`, formDat);
                         }
-                     
+
                     });
 
                     handleEditModalClose();
@@ -332,10 +343,27 @@ const ProductTable = () => {
             page * itemsPerPage)
     )
 
+
+    const selectStyles = {
+        input: {
+            '::placeholder': {
+                opacity: 1,
+                color: 'black',
+            },
+        },
+    };
     return (
         <div style={{
             backgroundColor: 'white',
         }}>
+            <h3
+                style={{
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                Product Table
+            </h3>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"
@@ -383,14 +411,16 @@ const ProductTable = () => {
                         <Col span={12}>
                             <Select
                                 label="Select Brand"
-                                placeholder="Select Brand"
-                                data={(
-                                    allBrandList.filter((item) => (item.category?.id == selectedProduct?.category))
-                                )
+                                placeholder={`${selectedProduct?.brand?.name}` || "Select Brand"}
+                                data={
+                                    (
+                                        allBrandList.filter((item) => (item.category?.id == selectedProduct?.category))
+                                    )
                                 }
-                                defaultValue={selectedProduct?.brand?.id}
-                                value={selectedProduct?.brand?.id}
+
+                                value={selectedProduct?.brand}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, brand: e })}
+                                styles={selectStyles}
                             />
                         </Col>
                         <Col span={6}>
@@ -430,14 +460,16 @@ const ProductTable = () => {
                         </Col>
 
                         <Col span={12}>
-                            <Group position="apart">
+                            <Group position="left">
+                                {
+                                    <Image width={300} height={150} fit="contain" src={selectedProduct?.image} mx="auto" radius="md" />}
                                 {
                                     selectedProduct?.images.map((item, index) => (
                                         <Group>
                                             <Button size={20} color="teal" onClick={() => removeProductImage(item.id)}>
                                                 <IconTrash size={15} />
                                             </Button>
-                                            <Image width={200} height={80} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
+                                            <Image width={300} height={150} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
                                         </Group>
                                     ))
                                 }
@@ -445,6 +477,8 @@ const ProductTable = () => {
                         </Col>
 
                         <Col span={12}>
+
+
                             {
                                 productImages.map((item, index) => {
                                     return (
@@ -563,12 +597,13 @@ const ProductTable = () => {
                         <th>Added By</th>
                         <th>Name</th>
                         <th>Price</th>
+                        <th>Cancel Price</th>
                         <th>Category</th>
                         <th>Brand</th>
                         <th>In Stock</th>
                         <th>Date Added</th>
                         <th>Action</th>
-                    
+
                     </tr>
                 </thead>
                 <tbody>
@@ -577,7 +612,8 @@ const ProductTable = () => {
                             <td>{index + 1}</td>
                             <td>{product.user?.first_name || product?.user?.username}</td>
                             <td>{product.name}</td>
-                            <td>{product.price}</td>
+                            <td>₹{product.price}</td>
+                            <td>₹{product.cancel_price}</td>
                             <td>{product?.category?.name}</td>
                             <td>{product?.brand?.name}</td>
                             <td>{product.available_quantity > 0 ? "Yes" : "No"}</td>
@@ -605,7 +641,7 @@ const ProductTable = () => {
                                     <IconEye onClick={() => handleEditModal(product)} size={24} />
                                 </Group>
                             </td>
-                  
+
                         </tr>
                     ))}
                 </tbody>

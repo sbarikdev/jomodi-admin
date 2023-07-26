@@ -46,6 +46,14 @@ const NewsLetter = () => {
    
     return (
         <div>
+            <h3
+                style={{
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                NewsLetter Table
+            </h3>
 <Table striped>
            
             <thead>

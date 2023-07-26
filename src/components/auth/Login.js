@@ -20,7 +20,7 @@ const Login = () => {
       };
       const decoded = await login(credentials);
       (decoded.admin == true) && (navigate('/dashboard'));
-      (decoded.admin == true) ? (
+      (decoded.admin == true && decoded.active == true) ? (
         notifications.show({
           title: 'Login Successful',
           message: `Welcome ${decoded?.username}`,

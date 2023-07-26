@@ -162,6 +162,14 @@ const BrandTable = () => {
             backgroundColor: 'white',
         }}
         >
+            <h3
+                style={{
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                Brand Table
+            </h3>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"

@@ -107,6 +107,7 @@ export default function AppSide() {
     const [userProfile, setUserProfile] = React.useState(null);
     const handleLogout = () => {
         localStorage.removeItem('admin');
+        localStorage.removeItem('authenticated')
         navigate('/login');
     };
     return (

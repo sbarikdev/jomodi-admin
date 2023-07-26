@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         if (user) {
             setIsAuthenticated(true);
+            (user.admin == true && user.active == true) && localStorage.setItem('authenticated', 'true');
             
-            localStorage.setItem('authenticated', 'true');
         } else {
             setIsAuthenticated(false);
         }
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (userData) => {
         const data = await loginUser(userData);
-        data.admin == true ? localStorage.setItem('admin', 'true') : localStorage.setItem('admin', 'false');
+        (data.admin == true && data.active == true)? localStorage.setItem('admin', 'true') : localStorage.setItem('admin', 'false');
         setUser(data);
         return data;
     };

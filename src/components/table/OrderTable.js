@@ -194,7 +194,7 @@ const OrderTable = () => {
 
     const [page, setPage] = useState(1);
 
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
 
     const totalPages = Math.ceil(filterOrderData?.length / itemsPerPage)
 
@@ -212,9 +212,18 @@ const OrderTable = () => {
     return (
         <div style={{
             backgroundColor: 'white',
-            overflowX: 'auto',
+            width: '1500px',
+
 
         }}>
+            <h3
+                style={{
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                Order Table
+            </h3>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"
@@ -238,8 +247,11 @@ const OrderTable = () => {
                 />
 
             </div>
-            <Table striped highlightOnHover withColumnBorders
-                styles={{ table: { minWidth: '900px' } }}>
+            <Table striped highlightOnHover
+                style={{
+                    width: '1500px',
+                }}
+            >
                 <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" >
                     <Select
                         data={[
@@ -308,7 +320,7 @@ const OrderTable = () => {
                     <br />
                     <Group position="apart">
                         <Text size="sm" weight={500}>
-                            Total Price: {selectedOrder?.total}
+                            Total Price: ₹{selectedOrder?.total}
                         </Text>
                         <Text size="sm" weight={500}>
                             Payment Method: {selectedOrder?.payment_method}
@@ -350,7 +362,7 @@ const OrderTable = () => {
                                     <td>{index + 1}</td>
                                     <td><img src={product.image} alt="" width="50px" /></td>
                                     <td>{product.name}</td>
-                                    <td>{product.price}</td>
+                                    <td>₹{product.price}</td>
                                     <td>{product.quantity}</td>
                                     <td>{product.price * product.quantity}</td>
                                     <td>{product.cancel ? "Yes" : "No"}</td>
@@ -389,38 +401,92 @@ const OrderTable = () => {
                             <td>{index + 1}</td>
                             <td>{order.order_id}</td>
                             <td>
-                                {dayjs(order.order_date).format("DD/MM/YY")}
+                                <Text size="sm"
+                                    style={{
+                                        width: '100px',
+                                    }}
+                                >
+                                    {dayjs(order.order_date).format("DD/MM/YY")}
+                                </Text>
                             </td>
-                            <td>{order.first_name} {order.last_naem}</td>
-                            <td>{order.user.username}</td>
-                            <td>{order.address}</td>
+                            <td>
+                                <Text size="sm"
+                                    style={{
+                                        width: '150px',
+                                    }}
+                                >
+                                    {order.first_name} {order.last_naem}
+                                </Text>
+                            </td>
+                            <td>
+                                <Text size="sm"
+                                    style={{
+                                        width: '100px',
+                                    }}
+                                >
+                                    {order.user.username}
+                                </Text>
+                            </td>
+                            <td>
+                                <Text size="sm"
+                                    style={{
+                                        width: '150px',
+                                    }}
+                                >
+                                    {order.address}
+                                </Text>
+                            </td>
                             <td>
                                 {
                                     order.products.map((item) => (
                                         <Group position="apart">
                                             <Text
                                                 color={item.cancel ? "red" : "black"}
-                                            >{item.name} x {item.quantity} </Text>
-                                            <Text size="sm" weight={400} color="teal">
-                                                {item.price}
-                                            </Text>
+                                                style={{
+                                                    width: '250px',
+                                                }}
+                                            >{item.name} x {item.quantity} :  ₹{item.price} </Text>
+
                                         </Group>
                                     ))
 
                                 }
                             </td>
-                            <td>{order.total}</td>
                             <td>
-                                <Text size="sm" weight={300} color="red">
+                                <Text size="sm" weight={300}
+                                    style={{
+                                        width: '100px',
+                                    }}
+                                >
+                                    ₹{order.total}
+                                </Text>
+                            </td>
+                            <td>
+                                <Text size="sm" color="red"
+                                    style={{
+                                        width: '170px',
+                                    }}
+                                >
                                     {order.status}
                                 </Text>
                             </td>
                             <td>
                                 {
                                     order.cancel ? (
-                                     dayjs(order.cancel_date).format("DD/MM/YY")
+                                        <Text size="sm" weight={300}
+                                            style={{
+                                                width: '100px',
+                                            }}
+                                        >
+                                            {dayjs(order.cancel_date).format("DD/MM/YY")}
+                                        </Text>
+
                                     ) : (
-                                        <Text size="sm" weight={300} color="red">
+                                        <Text size="sm" color="red"
+                                            style={{
+                                                width: '100px',
+                                            }}
+                                        >
                                             Not Cancelled
                                         </Text>
                                     )
@@ -433,7 +499,11 @@ const OrderTable = () => {
                                 />
                             </td>
                             <td>
-                                <Group>
+                                <Group
+                                style={{
+                                    width: '140px',
+                                }}
+                                >
                                     <IconEdit onClick={() => handleEditModal(order)} size={24} />
                                     <Menu shadow="md" width={200}>
                                         <Menu.Target>
@@ -459,7 +529,7 @@ const OrderTable = () => {
                     ))}
                 </tbody>
             </Table>
-            <Group spacing={5} position="right">
+            <Group spacing={5} position="center">
                 <Pagination my="lg" total={totalPages}
                     value={page}
                     onChange={handlePageChange} color="red"

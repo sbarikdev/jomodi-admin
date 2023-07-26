@@ -117,6 +117,14 @@ const CategoryTable = () => {
 
     return (
         <div>
+            <h3
+                style={{
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                Category Table
+            </h3>
         <Table striped style={{
             backgroundColor: 'white',
         }}>
