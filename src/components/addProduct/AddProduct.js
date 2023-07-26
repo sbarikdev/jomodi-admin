@@ -179,7 +179,6 @@ const AddProduct = () => {
       });
   };
 
-  console.log(colors);
 
   return (
     <Container size="sm">

@@ -60,7 +60,11 @@ const UserProfile = () => {
     
 
     return (
-        <div>
+        <div 
+        style={{
+            backgroundColor: 'white',
+        }}
+        >
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"

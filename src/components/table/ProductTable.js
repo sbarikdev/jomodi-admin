@@ -210,17 +210,21 @@ const ProductTable = () => {
             formData.append("show_color", selectedProduct.show_color);
             formData.append('show_gender', selectedProduct.show_gender)
 
+            console.log(selectedProduct)
+        
+
             axios
-                .put(
-                    `${API_URL}product/product_detail/${selectedProduct.id}/`,
+                .patch(
+                    `${API_URL}product/product/${selectedProduct.id}/`,
                     formData
                 )
                 .then((res) => {
                     console.log(res.data);
+                    console.log(formData)  
 
                     // Update productData state with the updated product
                     setProductData((prevProductData) => {
-                        const updatedProductData = prevProductData.map((product) =>
+                        const updatedProductData = prevProductData?.map((product) =>
                             product.id === selectedProduct.id ? res.data : product
                         );
                         return updatedProductData;
@@ -228,11 +232,14 @@ const ProductTable = () => {
 
                     // Close the edit modal
 
-                    productImages.forEach((file) => {
+                    productImages?.forEach((file) => {
                         const formDat = new FormData();
-                        formDat.append("product", selectedProduct.id);
-                        formDat.append("image", file.image);
-                        axios.post(`${API_URL}product/product_image/`, formDat);
+                        if (isFile(file.image)) {
+                            formDat.append("product", selectedProduct.id);
+                            formDat.append("image", file.image);
+                            axios.post(`${API_URL}product/product_image/`, formDat);
+                        }
+                     
                     });
 
                     handleEditModalClose();
@@ -308,7 +315,9 @@ const ProductTable = () => {
     const filterProductData = filterData?.length ? filterData : productData;
 
     return (
-        <div>
+        <div style={{
+            backgroundColor: 'white',
+        }}>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"
@@ -358,7 +367,7 @@ const ProductTable = () => {
                                 label="Select Brand"
                                 placeholder="Select Brand"
                                 data={(
-                                    allBrandList.filter((item) => (item.category.id == selectedProduct?.category))
+                                    allBrandList.filter((item) => (item.category?.id == selectedProduct?.category))
                                 )
                                 }
                                 defaultValue={selectedProduct?.brand?.id}
@@ -539,8 +548,9 @@ const ProductTable = () => {
                         <th>Category</th>
                         <th>Brand</th>
                         <th>In Stock</th>
-                        <th>Action</th>
                         <th>Date Added</th>
+                        <th>Action</th>
+                    
                     </tr>
                 </thead>
                 <tbody>
@@ -550,9 +560,10 @@ const ProductTable = () => {
                             <td>{product.user?.first_name || product?.user?.username}</td>
                             <td>{product.name}</td>
                             <td>{product.price}</td>
-                            <td>{product.category.name}</td>
-                            <td>{product.brand.name}</td>
-                            <td>{product.inStock ? "Yes" : "No"}</td>
+                            <td>{product?.category?.name}</td>
+                            <td>{product?.brand?.name}</td>
+                            <td>{product.available_quantity > 0 ? "Yes" : "No"}</td>
+                            <td>{dayjs(product.created_at).format("DD/MM/YYYY")}</td>
                             <td>
                                 <Group>
                                     <IconEdit onClick={() => handleEditModal(product)} size={24} />
@@ -576,7 +587,7 @@ const ProductTable = () => {
                                     <IconEye onClick={() => handleEditModal(product)} size={24} />
                                 </Group>
                             </td>
-                            <td>{dayjs(product.created_at).format("DD/MM/YYYY")}</td>
+                  
                         </tr>
                     ))}
                 </tbody>

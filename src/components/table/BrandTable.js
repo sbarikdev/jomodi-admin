@@ -5,7 +5,7 @@ import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
 import { IconEdit, IconEye, IconTrash, IconSearch } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
-import { Checkbox } from "tabler-icons-react";
+import { Checkbox, Select } from "tabler-icons-react";
 import dayjs from "dayjs";
 
 
@@ -90,7 +90,7 @@ const BrandTable = () => {
 
     useEffect(() => {
         axios
-            .get(`${API_URL}category/brand/`)
+            .get(`${API_URL}category/brand-detail/`)
             .then((res) => {
                 console.log(res.data.results);
                 setBrandData(res.data.results);
@@ -108,13 +108,13 @@ const BrandTable = () => {
 
     const allCategoryList = brandData.reduce((acc, brand) => {
         // Check if the category ID is already present in the Set
-        if (!uniqueCategoryIds.has(brand.category.id)) {
+        if (!uniqueCategoryIds.has(brand.category?.id)) {
             // Add the category ID to the Set
-            uniqueCategoryIds.add(brand.category.id);
+            uniqueCategoryIds.add(brand.category?.id);
             // Push the category object into the accumulator array
             acc.push({
-                label: brand.category.name,
-                value: brand.category.id,
+                label: brand.category?.name,
+                value: brand.category?.id,
             });
         }
         return acc;
@@ -122,12 +122,12 @@ const BrandTable = () => {
 
     const filterData = brandData.filter((item) => {
         // Check if filterCategory is an array and includes the category ID
-        const categoryMatch = Array.isArray(filterCategory) && filterCategory.includes(item.category.id);
+        const categoryMatch = Array.isArray(filterCategory) && filterCategory.includes(item.category?.id);
 
         // Check if filterName exists and matches the brand name or category name (case-insensitive)
         const nameMatch = filterName && (
             item.name.toLowerCase().includes(filterName.toLowerCase()) ||
-            (item.category && item.category.name.toLowerCase().includes(filterName.toLowerCase()))
+            (item.category && item.category?.name.toLowerCase().includes(filterName.toLowerCase()))
         );
 
         // Return true if any of the filter criteria match, otherwise false
@@ -139,7 +139,11 @@ const BrandTable = () => {
     const filteredData = filterData.length ? filterData : brandData;
 
     return (
-        <div>
+        <div
+        style={{
+            backgroundColor: 'white',
+        }}
+        >
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"
@@ -170,6 +174,18 @@ const BrandTable = () => {
                             })
                         }
                     />
+                    
+                        <Select
+                            label="Category"
+                            value={selectBrand?.category?.id} // Use the ID of the selected category as the value
+                            onChange={(e) =>
+                                setSelectBrand((prevBrand) => {
+                                    return { ...prevBrand, category: e.target.value };
+                                })
+                            }
+                            data={allCategoryList}
+                        />
+
                 </Modal.Body>
                 <Button onClick={() => handleBrandUpdate(selectBrand.id)}>Update</Button>
             </Modal>
@@ -191,16 +207,18 @@ const BrandTable = () => {
                     <th>
                         Category
                     </th>
+                        <th>Date Created</th>
                     <th>Action</th>
-                    <th>Date Created</th>
+                 
                 </tr>
             </thead>
             <tbody>
                 {filteredData.map((brand, index) => (
                     <tr key={brand.id}>
                         <td>{index + 1}</td>
-                        <td>{brand.name}</td>
-                        <td>{brand.category.name}</td>
+                        <td>{brand?.name}</td>
+                        <td>{brand.category?.name}</td>
+                        <td>{dayjs(brand.created_at).format("DD/MM/YYYY")}</td>
                         <td>
                             <Group>
                                 <IconEdit onClick={() => handleEditModal(brand)} size={24} />
@@ -223,7 +241,7 @@ const BrandTable = () => {
                             </Group>
 
                         </td>
-                        <td>{dayjs(brand.created_at).format("DD/MM/YYYY")}</td>
+    
                     </tr>
                 ))}
             </tbody>

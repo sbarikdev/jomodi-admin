@@ -151,7 +151,9 @@ const UserOrder = () => {
 
 
     return (
-        <Table striped>
+        <Table striped style={{
+            backgroundColor: 'white',
+        }}>
             <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" p={30}>
                 <Select
                     data={[

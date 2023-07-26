@@ -101,7 +101,9 @@ const CategoryTable = () => {
 
 
     return (
-        <Table striped>
+        <Table striped style={{
+            backgroundColor: 'white',
+        }}>
             <Modal opened={editModalOpen} onClose={handleEditModalClose} size="md">
                 <Modal.Header>Update Category</Modal.Header>
                 <Modal.Body>
@@ -154,8 +156,9 @@ const CategoryTable = () => {
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>Action</th>
+         
                     <th>Date Created</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -163,6 +166,7 @@ const CategoryTable = () => {
                     <tr key={category.id}>
                         <td>{index + 1}</td>
                         <td>{category.name}</td>
+                        <td>{dayjs(category.created_at).format("DD/MM/YYYY")}</td>
                         <td>
                             <Group>
                                 <IconEdit onClick={() => handleEditModal(category)} size={24} />
@@ -185,7 +189,7 @@ const CategoryTable = () => {
                             </Group>
 
                         </td>
-                        <td>{dayjs(category.created_at).format("DD/MM/YYYY")}</td>
+
                     </tr>
                 ))}
             </tbody>

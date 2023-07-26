@@ -197,7 +197,11 @@ const OrderTable = () => {
 
 
         return (
-            <div>
+            <div style={{
+                backgroundColor: 'white',
+                overflowX: 'auto',
+
+            }}>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                     <TextInput
                         label="Name"
@@ -221,7 +225,8 @@ const OrderTable = () => {
                     />
 
                 </div>
-                <Table striped highlightOnHover withColumnBorders>
+                <Table striped highlightOnHover withColumnBorders 
+                styles={{ table: { minWidth: '900px' } }}>
                     <Modal opened={openEditModal} onClose={handleCloseModal} title="Edit Order" >
                         <Select
                             data={[
@@ -316,6 +321,7 @@ const OrderTable = () => {
                         <Table striped>
                             <thead>
                                 <tr>
+                                    
                                     <th>ID</th>
                                     <th>Image</th>
                                     <th>Name</th>
@@ -346,6 +352,7 @@ const OrderTable = () => {
 
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>ID</th>
                             <th>Date</th>
                             <th>Name</th>
@@ -364,6 +371,7 @@ const OrderTable = () => {
                         {filterOrderData?.map((order, index) => (
                             <tr key={order.id}>
                                 <td>{index + 1}</td>
+                                <td>{order.order_id}</td>
                                 <td>
                                     {dayjs(order.order_date).format("DD/MM/YY")}
                                 </td>
