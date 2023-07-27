@@ -156,13 +156,13 @@ const AddProduct = () => {
           formDat.append("size", item);
           axios.post(`${API_URL}product/size/`, formDat);
         });
-        colors.split(',').forEach((item) => {
+        colors && (colors.forEach((item) => {
           const formDat = new FormData();
           formDat.append("product", res.data.id);
           formDat.append("color", item);
           axios.post(`${API_URL}product/color/`, formDat);
         }
-        );
+        ));
         setLoading(false)
         notifications.show({
           title: "Product Added",
