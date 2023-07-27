@@ -1,11 +1,10 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Pagination, Loader } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, Pagination, Loader, Select } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
 import { IconEdit, IconEye, IconTrash, IconSearch } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
-import { Checkbox } from "tabler-icons-react";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +22,6 @@ const UserProfile = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [submitting, setSubmitting] = useState(false)
-
 
     const handleOpenModal = () => {
         setOpenModal(true);
@@ -138,8 +136,9 @@ const UserProfile = () => {
     const filteredData = filterData.length ? filterData : profileData;
 
     const [page, setPage] = useState(1);
+    const [paginationNumber, setPaginationNumber] = useState(10)
 
-    const itemsPerPage = 10;
+    const itemsPerPage = paginationNumber;
 
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage)
 
@@ -179,6 +178,15 @@ const UserProfile = () => {
                     onChange={(event) => setFilterName(event.currentTarget.value)}
                     placeholder="Enter name..."
                 />
+                <Select
+                    label={`Show ${paginationNumber} per page `}
+                    value={paginationNumber} onChange={setPaginationNumber} data={[
+                        { value: 10, label: '10' },
+                        { value: 20, label: '20' },
+                        { value: 30, label: '30' },
+                        { value: 40, label: '40' },
+                        { value: 50, label: '50' }
+                    ]} />
 
                 <Button onClick={handleOpenModal}
 

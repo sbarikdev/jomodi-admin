@@ -18,6 +18,7 @@ const OrderTable = () => {
     const [filterCategory, setFilterCategory] = useState("");
     const [filterBrand, setFilterBrand] = useState("");
     const [allCategory, setAllCategory] = useState([]);
+    const [filterStatus, setFilterStatus] = useState('')
     const [allBrand, setAllBrand] = useState([]);
     const [allProduct, setAllProduct] = useState([]);
 
@@ -186,15 +187,17 @@ const OrderTable = () => {
             (item.first_name.toLowerCase().includes(filterName.toLowerCase()) ||
                 item.order_id.toLowerCase().includes(filterName.toLowerCase()));
 
+        const statusMatch = filterStatus && item.status.toLowerCase().includes(filterStatus.toLowerCase())
+
         // Return true if any of the filter criteria match, otherwise false
-        return categoryMatch || brandMatch || nameMatch;
+        return categoryMatch || brandMatch || nameMatch || statusMatch;
     });
 
     const filterOrderData = filterData?.length ? filterData : orderData;
-
+    const [paginationNumber, setPaginationNumber] = useState(10)
     const [page, setPage] = useState(1);
 
-    const itemsPerPage = 10;
+    const itemsPerPage = paginationNumber;
 
     const totalPages = Math.ceil(filterOrderData?.length / itemsPerPage)
 
@@ -245,6 +248,29 @@ const OrderTable = () => {
                     onChange={(value) => setFilterBrand(value)}
                     data={allBrandList}
                 />
+                <Select
+                    data={[
+                        { value: "Shipping In Progress", label: "Shipping In Progress" },
+                        { value: "Shipped", label: "Shipped" },
+                        { value: "Out for Delivery", label: "Out For Delivery" },
+                        { value: "Delivered", label: "Delivered" },
+                        { value: "Cancelled", label: "Cancelled" },
+                        { value: 'Cancel Requested', label: 'Cancel Requested' }
+                    ]}
+                    label="Status"
+                    placeholder="Status"
+                    value={filterStatus}
+                    onChange={setFilterStatus}
+                />
+                <Select
+                    label={`Show ${paginationNumber} per page `}
+                    value={paginationNumber} onChange={setPaginationNumber} data={[
+                        { value: 10, label: '10' },
+                        { value: 20, label: '20' },
+                        { value: 30, label: '30' },
+                        { value: 40, label: '40' },
+                        { value: 50, label: '50' }
+                    ]} />
 
             </div>
             <Table striped highlightOnHover
@@ -260,7 +286,6 @@ const OrderTable = () => {
                             { value: "Out for Delivery", label: "Out For Delivery" },
                             { value: "Delivered", label: "Delivered" },
                             { value: "Cancelled", label: "Cancelled" },
-                            { value: 'Cancel Requested', label: 'Cancel Requested' }
                         ]}
                         label="Status"
                         placeholder="Status"
@@ -341,6 +366,11 @@ const OrderTable = () => {
                         <Text size="sm" weight={500}>
                             Products:
                         </Text>
+                        <Text size="sm" weight={500}>
+                            Paid : {
+                                selectedOrder?.paid ? "Yes" : "No"
+                            }
+                        </Text>
                     </Group>
                     <br />
                     <Table striped>
@@ -379,7 +409,7 @@ const OrderTable = () => {
                     <tr>
                         <th>#</th>
                         <th>ID</th>
-                        <th>Date</th>
+                        <th>Order Date</th>
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Address</th>
@@ -462,7 +492,7 @@ const OrderTable = () => {
                                 </Text>
                             </td>
                             <td>
-                                <Text size="sm" color="red"
+                                <Text size="sm" color={order?.cancel ? "red" : (order?.status.toLowerCase() == 'delivered' ? 'teal' : 'black')}
                                     style={{
                                         width: '170px',
                                     }}

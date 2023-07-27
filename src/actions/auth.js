@@ -3,6 +3,7 @@ import jwt_decode from 'jwt-decode';
 import { API_URL } from '../constant';  
 import { useNavigate } from 'react-router-dom';
 
+
 export const loginUser = async (userData) => {
     try {
         const res = await axios.post(`${API_URL}auth/login`, userData);

@@ -50,6 +50,13 @@ const ProductTable = () => {
     const [filterBrand, setFilterBrand] = useState("");
     const [filteredData, setFilteredData] = useState([]);
 
+    const [showSizeModal, setShowSizeModal] = useState(false)
+    const [showColorModal, setShowColorModal] = useState(false)
+    const [showGenderModal, setShowGenderModal] = useState(false)
+    const [sizes, setSizes] = useState('')
+    const [colors, setColors] = useState("")
+    const [genders, setGenders] = useState("")
+
 
 
     const handleAddProductImageField = () => {
@@ -217,6 +224,10 @@ const ProductTable = () => {
             formData.append("show_size", selectedProduct.show_size);
             formData.append("show_color", selectedProduct.show_color);
             formData.append('show_gender', selectedProduct.show_gender)
+            formData.append('size', JSON.stringify(selectedProduct?.size))
+            formData.append('color', JSON.stringify(selectedProduct?.color))
+            formData.append('gender', JSON.stringify(selectedProduct?.gender))
+
 
             axios
                 .patch(
@@ -318,9 +329,11 @@ const ProductTable = () => {
 
     const filterProductData = filterData?.length ? filterData : productData;
 
+    const [paginationNumber, setPaginationNumber] = useState(10)
+
     const [page, setPage] = useState(1);
 
-    const itemsPerPage = 10;
+    const itemsPerPage = paginationNumber;
 
     const totalPages = Math.ceil(filterProductData?.length / itemsPerPage)
 
@@ -348,6 +361,9 @@ const ProductTable = () => {
         <div style={{
             backgroundColor: 'white',
         }}>
+
+
+
             <h3
                 style={{
                     textAlign: 'center',
@@ -377,6 +393,16 @@ const ProductTable = () => {
                     onChange={(value) => setFilterBrand(value)}
                     data={allBrandList}
                 />
+
+                <Select
+                    label={`Show ${paginationNumber} per page `}
+                    value={paginationNumber} onChange={setPaginationNumber} data={[
+                        { value: 10, label: '10' },
+                        { value: 20, label: '20' },
+                        { value: 30, label: '30' },
+                        { value: 40, label: '40' },
+                        { value: 50, label: '50' }
+                    ]} />
             </div>
             <Table striped>
                 <Modal
@@ -385,6 +411,62 @@ const ProductTable = () => {
                     size="70%"
                     padding="md"
                 >
+                    <Modal opened={showSizeModal} onClose={() => setShowSizeModal(false)} size="md">
+                        <Modal.Header>Add Size</Modal.Header>
+                        <Modal.Body>
+                            <TextInput
+                                label="Product Sizes"
+                                placeholder="Enter Sizes"
+                                value={selectedProduct?.size}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, size: e.target.value })}
+
+                            />
+                        </Modal.Body>
+                        <Button onClick={() => setShowSizeModal(false)}>Save</Button>
+                    </Modal>
+                    <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md" height={500}>
+                        <MultiSelect
+                            data={[
+                                { value: "red", label: "Red" },
+                                { value: "blue", label: "Blue" },
+                                { value: "green", label: "Green" },
+                                { value: "yellow", label: "Yellow" },
+                                { value: "black", label: "Black" },
+                                { value: "white", label: "White" },
+                                { value: "pink", label: "Pink" },
+                                { value: "purple", label: "Purple" },
+                                { value: "orange", label: "Orange" },
+                                { value: "brown", label: "Brown" },
+                                { value: "gray", label: "Gray" },
+                                { value: "silver", label: "Silver" },
+                                { value: "gold", label: "Gold" },
+                            ]}
+                            label="Product Color"
+                            placeholder="Enter Color"
+                            value={selectedProduct?.color}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, color: e })
+                            }
+                        />
+                        <Button onClick={() => setShowColorModal(false)} mt={300}>Save </Button>
+                    </Modal>
+
+                    <Modal opened={showGenderModal} onClose={() => setShowGenderModal(false)} size="md" height={500}>
+                        <MultiSelect
+                            data={[
+                                { value: "Man", label: "Man" },
+                                { value: "Woman", label: "Woman" },
+                                { value: "Boy", label: "Boy" },
+                                { value: "Girl", label: "Girl" },
+                                { value: "Kids", label: "Kids" },
+                            ]}
+                            label="Select Gender"
+                            placeholder="Enter Gender"
+                            value={selectedProduct?.gender}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, gender: e })}
+                        />
+                        <Button onClick={() => setShowGenderModal(false)} mt={300}>Save </Button>
+                    </Modal>
+
                     <Modal.Title>Edit Product</Modal.Title>
 
                     <Grid>
@@ -454,15 +536,24 @@ const ProductTable = () => {
                         <Col span={12}>
                             <Group position="left">
                                 {
-                                    <Image width={300} height={150} fit="contain" src={selectedProduct?.image} mx="auto" radius="md" />}
+                                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                                        <Image width={150} height={120} fit="contain" src={selectedProduct?.image} mx="auto" radius="md" />
+                                    </div>
+
+                                }
                                 {
                                     selectedProduct?.images.map((item, index) => (
-                                        <Group>
-                                            <Button size={20} color="teal" onClick={() => removeProductImage(item.id)}>
+                                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                                            <Image width={150} height={120} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
+                                            <Button
+                                                size={10}
+                                                color="red"
+                                                onClick={() => removeProductImage(item.id)}
+                                                style={{ position: 'absolute', top: 0, right: 0 }}
+                                            >
                                                 <IconTrash size={15} />
                                             </Button>
-                                            <Image width={300} height={150} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
-                                        </Group>
+                                        </div>
                                     ))
                                 }
                             </Group>
@@ -512,7 +603,7 @@ const ProductTable = () => {
                                 label="Available Quantity" placeholder="Available Quantity" />
                         </Col>
                         <Col span={4}>
-                            <Text size="sm">Discount</Text>
+                            <Text size="sm">Show Discount</Text>
                             <input
                                 type="checkbox"
                                 checked={selectedProduct?.discount}
@@ -520,7 +611,7 @@ const ProductTable = () => {
                             />
                         </Col>
                         <Col span={4}>
-                            <Text size="sm">New Arrival</Text>
+                            <Text size="sm">Show New Arrival</Text>
                             <input
                                 type="checkbox"
                                 checked={selectedProduct?.new_arrival}
@@ -528,7 +619,7 @@ const ProductTable = () => {
                             />
                         </Col>
                         <Col span={4}>
-                            <Text size="sm">Top Product</Text>
+                            <Text size="sm">Show Top Product</Text>
                             <input
                                 type="checkbox"
                                 checked={selectedProduct?.top_product}
@@ -536,7 +627,7 @@ const ProductTable = () => {
                             />
                         </Col>
                         <Col span={4}>
-                            <Text size="sm">New Product</Text>
+                            <Text size="sm">Show New Product</Text>
                             <input
                                 type="checkbox"
                                 checked={selectedProduct?.new_product}
@@ -550,6 +641,22 @@ const ProductTable = () => {
                                 checked={selectedProduct?.show_size}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, show_size: e.target.checked })}
                             />
+                            {
+                                selectedProduct?.show_size && (
+                                    <UnstyledButton onClick={() => setShowSizeModal(true)} >
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            {/* <Group mt="sm" position="left">
+                                {
+                                    sizes.split(',').map((item) => {
+                                        return (
+                                            <Text>{item}</Text>
+                                        )
+                                    })
+                                }
+                            </Group> */}
                         </Col>
                         <Col span={4}>
                             <Text size="sm">Show Color</Text>
@@ -559,6 +666,23 @@ const ProductTable = () => {
                                 checked={selectedProduct?.show_color}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, show_color: e.target.checked })}
                             />
+                            {
+                                selectedProduct?.show_color && (
+                                    <UnstyledButton onClick={() => setShowColorModal(true)}>
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            {/* <Group mt="sm" position="left">
+                                {
+                                    colors && colors?.map((item) =>
+                                    (
+                                        <Text>{item}</Text>
+                                    )
+                                    )
+
+                                }
+                            </Group> */}
                         </Col>
                         <Col span={4}>
                             <Text size="sm">
@@ -569,7 +693,97 @@ const ProductTable = () => {
                                 checked={selectedProduct?.show_gender}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, show_gender: e.target.checked })}
                             />
+                            {
+                                selectedProduct?.show_gender && (
+                                    <UnstyledButton onClick={() => setShowGenderModal(true)}>
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            {/* <Group mt="sm" position="left">
+                                {
+                                    genders && genders?.map((item) =>
+                                    (
+                                        <Text>{item}</Text>
+                                    )
+                                    )
+
+                                }
+                            </Group> */}
                         </Col>
+
+                        {/* <Col span={4}>
+                            <Checkbox
+                                label="Show Size"
+                                checked={showSize}
+                                onChange={(event) => setShowSize(event.currentTarget.checked)}
+                            />
+                            {
+                                showSize && (
+                                    <UnstyledButton onClick={() => setShowSizeModal(true)} >
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            <Group mt="sm" position="left">
+                                {
+                                    sizes.split(',').map((item) => {
+                                        return (
+                                            <Text>{item}</Text>
+                                        )
+                                    })
+                                }
+                            </Group>
+
+                        </Col>
+                        <Col span={4}>
+                            <Checkbox
+                                label="Show Color"
+                                checked={showColor}
+                                onChange={(event) => setShowColor(event.currentTarget.checked)}
+                            />
+                            {
+                                showColor && (
+                                    <UnstyledButton onClick={() => setShowColorModal(true)}>
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            <Group mt="sm" position="left">
+                                {
+                                    colors && colors?.map((item) =>
+                                    (
+                                        <Text>{item}</Text>
+                                    )
+                                    )
+
+                                }
+                            </Group>
+                        </Col>
+                        <Col span={4}>
+                            <Checkbox
+                                label="Show Gender"
+                                checked={showGender}
+                                onChange={(event) => setShowGender(event.currentTarget.checked)}
+                            />
+                            {
+                                showGender && (
+                                    <UnstyledButton onClick={() => setShowGenderModal(true)}>
+                                        <IconPlus size={20} />
+                                    </UnstyledButton>
+                                )
+                            }
+                            <Group mt="sm" position="left">
+                                {
+                                    genders && genders?.map((item) =>
+                                    (
+                                        <Text>{item}</Text>
+                                    )
+                                    )
+
+                                }
+                            </Group>
+                        </Col> */}
 
                     </Grid>
 

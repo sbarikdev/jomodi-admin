@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (userData) => {
         const data = await loginUser(userData);
-        (data.admin == true && data.active == true)? localStorage.setItem('admin', 'true') : localStorage.setItem('admin', 'false');
         setUser(data);
         return data;
     };

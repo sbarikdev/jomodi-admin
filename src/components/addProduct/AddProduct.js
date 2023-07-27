@@ -47,8 +47,10 @@ const AddProduct = () => {
   const [additionalImages, setAdditionalImages] = useState([]);
   const [showSizeModal, setShowSizeModal] = useState(false)
   const [showColorModal, setShowColorModal] = useState(false)
+  const [showGenderModal, setShowGenderModal] = useState(false)
   const [sizes, setSizes] = useState('')
   const [colors, setColors] = useState("")
+  const [genders, setGenders] = useState("")
   const [loading, setLoading] = useState(false)
   const [productImages, setProductImages] = useState([
     { image: [] }
@@ -138,6 +140,10 @@ const AddProduct = () => {
     formData.append("new_product", newProduct);
     formData.append("show_size", showSize);
     formData.append("show_color", showColor);
+    formData.append('show_gender', showGender)
+    sizes && formData.append('size', JSON.stringify(sizes))
+    colors && formData.append('color', JSON.stringify(colors))
+    genders && formData.append('gender', JSON.stringify(genders))
     formData.append('user', user?.user_id)
 
     axios
@@ -150,19 +156,19 @@ const AddProduct = () => {
           formDat.append("image", file.image);
           axios.post(`${API_URL}product/product_image/`, formDat);
         });
-        sizes.split(',').forEach((item) => {
-          const formDat = new FormData();
-          formDat.append("product", res.data.id);
-          formDat.append("size", item);
-          axios.post(`${API_URL}product/size/`, formDat);
-        });
-        colors && (colors.forEach((item) => {
-          const formDat = new FormData();
-          formDat.append("product", res.data.id);
-          formDat.append("color", item);
-          axios.post(`${API_URL}product/color/`, formDat);
-        }
-        ));
+        // sizes.split(',').forEach((item) => {
+        //   const formDat = new FormData();
+        //   formDat.append("product", res.data.id);
+        //   formDat.append("size", item);
+        //   axios.post(`${API_URL}product/size/`, formDat);
+        // });
+        // colors && (colors.forEach((item) => {
+        //   const formDat = new FormData();
+        //   formDat.append("product", res.data.id);
+        //   formDat.append("color", item);
+        //   axios.post(`${API_URL}product/color/`, formDat);
+        // }
+        // ));
         setLoading(false)
         notifications.show({
           title: "Product Added",
@@ -219,6 +225,23 @@ const AddProduct = () => {
           }
         />
         <Button onClick={() => setShowColorModal(false)} mt={300}>Save </Button>
+      </Modal>
+
+      <Modal opened={showGenderModal} onClose={() => setShowGenderModal(false)} size="md" height={500}>
+        <MultiSelect
+          data={[
+            { value: "Man", label: "Man" },
+            { value: "Woman", label: "Woman" },
+            { value: "Boy", label: "Boy" },
+            { value: "Girl", label: "Girl" },
+            { value: "Kids", label: "Kids" },
+          ]}
+          label="Select Gender"
+          placeholder="Enter Gender"
+          value={genders}
+          onChange={setGenders}
+        />
+        <Button onClick={() => setShowGenderModal(false)} mt={300}>Save </Button>
       </Modal>
       <h1>Add Product</h1>
       {
@@ -328,15 +351,14 @@ const AddProduct = () => {
             </Col>
             <Col span={4}>
               <Checkbox
-                label="Discount"
+                label="Show Discount"
                 checked={discount}
                 onChange={(event) => setDiscount(event.currentTarget.checked)}
               />
             </Col>
             <Col span={4}>
               <Checkbox
-
-                label="New Arrival"
+                label="Show New Arrival"
                 checked={newArrival}
                 onChange={(event) => setNewArrival(event.currentTarget.checked)}
               />
@@ -344,14 +366,14 @@ const AddProduct = () => {
 
             <Col span={4}>
               <Checkbox
-                label="Top Product"
+                label="Show Top Product"
                 checked={topProduct}
                 onChange={(event) => setTopProduct(event.currentTarget.checked)}
               />
             </Col>
             <Col span={4}>
               <Checkbox
-                label="New Product"
+                label="Show New Product"
                 checked={newProduct}
                 onChange={(event) => setNewProduct(event.currentTarget.checked)}
               />
@@ -410,6 +432,23 @@ const AddProduct = () => {
                 checked={showGender}
                 onChange={(event) => setShowGender(event.currentTarget.checked)}
               />
+              {
+                showGender && (
+                  <UnstyledButton onClick={() => setShowGenderModal(true)}>
+                    <IconPlus size={20} />
+                  </UnstyledButton>
+                )
+              }
+              <Group mt="sm" position="left">
+                {
+                  genders && genders?.map((item) =>
+                  (
+                    <Text>{item}</Text>
+                  )
+                  )
+
+                }
+              </Group>
             </Col>
 
           </Grid>

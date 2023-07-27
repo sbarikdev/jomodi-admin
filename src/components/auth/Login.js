@@ -19,7 +19,6 @@ const Login = () => {
         password: password,
       };
       const decoded = await login(credentials);
-      (decoded.admin == true) && (navigate('/dashboard'));
       (decoded.admin == true && decoded.active == true) ? (
         notifications.show({
           title: 'Login Successful',
@@ -35,6 +34,7 @@ const Login = () => {
           autoClose: 5000,
         })
       )
+      navigate('/dashboard')
       
     } catch (err) {
       notifications.show({

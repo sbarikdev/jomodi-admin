@@ -1,11 +1,11 @@
 import React from "react";
-import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, TextInput, MultiSelect, Pagination } from "@mantine/core";
+import { Table, Text, Group, Menu, Button, rem, UnstyledButton, Modal, 
+    TextInput, MultiSelect, Pagination, Select, Checkbox } from "@mantine/core";
 import axios from "axios";
 import { API_URL } from "../../constant";
 import { useEffect, useState } from "react";
 import { IconEdit, IconEye, IconTrash, IconSearch } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
-import { Checkbox, Select } from "tabler-icons-react";
 import dayjs from "dayjs";
 
 
@@ -62,7 +62,7 @@ const BrandTable = () => {
         axios
             .put(`${API_URL}category/brand/${id}/`, {
                 name: selectBrand.name,
-                category: selectBrand.category.id,
+                category: selectBrand.category,
             })
             .then((res) => {
                 console.log(res.data);
@@ -74,7 +74,7 @@ const BrandTable = () => {
                 });
                 setBrandData((prevBrandData) => {
                     return prevBrandData.map((brand) => {
-                        if (brand.id === id) {
+                        if (brand.id == id) {
                             return res.data;
                         }
                         return brand;
@@ -140,8 +140,8 @@ const BrandTable = () => {
     const filteredData = filterData.length ? filterData : brandData;
 
     const [page, setPage] = useState(1);
-
-    const itemsPerPage = 10;
+    const [paginationNumber, setPaginationNumber] = useState(10)
+    const itemsPerPage = paginationNumber;
 
     const totalPages =  Math.ceil(filteredData?.length / itemsPerPage)
 
@@ -184,12 +184,24 @@ const BrandTable = () => {
                     onChange={(value) => setFilterCategory(value)}
                     data={allCategoryList}
                 />
+                <Select
+                    label={`Show ${paginationNumber} per page `}
+                    value={paginationNumber} onChange={setPaginationNumber} data={[
+                        { value: 10, label: '10' },
+                        { value: 20, label: '20' },
+                        { value: 30, label: '30' },
+                        { value: 40, label: '40' },
+                        { value: 50, label: '50' }
+                    ]} />
             </div>
         <Table striped>
             <Modal opened={editModalOpen} onClose={handleEditModalClose} size="md">
                 <Modal.Header>Update Brand</Modal.Header>
                 <Modal.Body>
-                    <TextInput
+                    <div style={{
+                        height: '300px',
+                    }}>
+                     <TextInput
 
                         label="Brand Name"
                         placeholder="Enter Brand Name"
@@ -201,16 +213,18 @@ const BrandTable = () => {
                         }
                     />
                     
-                        {/* <Select
+                        <Select
                             label="Category"
                             value={selectBrand?.category?.id} // Use the ID of the selected category as the value
                             onChange={(e) =>
                                 setSelectBrand((prevBrand) => {
-                                    return { ...prevBrand, category: e.target.value };
+                                    return { ...prevBrand, category: e };
                                 })
                             }
                             data={allCategoryList}
-                        /> */}
+                        />   
+                    </div>
+                    
 
                 </Modal.Body>
                 <Button onClick={() => handleBrandUpdate(selectBrand.id)}>Update</Button>
