@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { loginUser, registerUser, logoutUser, getCurrentUser } from '../actions/auth';
 import { API_URL } from '../constant';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -12,7 +13,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(getCurrentUser());
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
 
     useEffect(() => {
         if (user) {

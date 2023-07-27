@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Card, Container, Input, Notification } from '@mantine/core';
+import { Button, Card, Container, Input, Notification, Image } from '@mantine/core';
 import { useAuth } from '../../context/auth-context';
 import { notifications } from '@mantine/notifications';
 
@@ -19,23 +19,25 @@ const Login = () => {
         password: password,
       };
       const decoded = await login(credentials);
-      (decoded.admin == true && decoded.active == true) ? (
+      if (decoded.admin === true && decoded.active === true) {
+        navigate('/dashboard');
+
         notifications.show({
           title: 'Login Successful',
           message: `Welcome ${decoded?.username}`,
           color: 'teal',
           autoClose: 5000,
-        })
-      ) : (
+        });
+      } else {
         notifications.show({
           title: 'Not Authorized',
-          message: `You are not authorized to access this page`,
+          message: 'You are not authorized to access this page',
           color: 'red',
           autoClose: 5000,
-        })
-      )
-      navigate('/dashboard')
-      
+        });
+      }
+      // Navigate to '/dashboard' only if the login is successful and authorized
+
     } catch (err) {
       notifications.show({
         title: 'Login Failed',
@@ -44,10 +46,7 @@ const Login = () => {
         autoClose: 5000,
       });
     }
-
   };
-
-
 
   return (
     <Container size="xl" style={{
@@ -56,10 +55,10 @@ const Login = () => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-
     }}>
+      <Image src="./jomo.jpg" width={100} height={100} />
       <Card shadow="sm" >
-        <form onSubmit={handleLogin}>
+        
           <div style={{ marginBottom: 20 }}>
             <Input
               type="text"
@@ -81,11 +80,13 @@ const Login = () => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button type="submit" variant="gradient" color="teal">
+            <Button
+            onClick={handleLogin}
+            variant="gradient" color="teal">
               Login
             </Button>
           </div>
-        </form>
+   
       </Card>
     </Container>
   );

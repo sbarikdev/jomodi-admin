@@ -53,7 +53,6 @@ function MainRoute() {
                 <Route path="newsletter" element={wrapPrivateRoute(<NewsLetter />, isAuthenticated)} />
                 <Route path="user-order/:id" element={wrapPrivateRoute(<UserOrder />, isAuthenticated)} />
                 <Route path="*" element={<h1>Not Found</h1>} />
-            
             </Route>
             <Route path="/login" element={<Login />} />
         </Routes>

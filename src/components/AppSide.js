@@ -108,6 +108,7 @@ export default function AppSide() {
     const handleLogout = () => {
         localStorage.removeItem('admin');
         localStorage.removeItem('authenticated')
+        localStorage.removeItem('jwtToken');
         navigate('/login');
     };
     return (

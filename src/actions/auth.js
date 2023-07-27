@@ -1,7 +1,6 @@
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { API_URL } from '../constant';  
-import { useNavigate } from 'react-router-dom';
 
 
 export const loginUser = async (userData) => {
