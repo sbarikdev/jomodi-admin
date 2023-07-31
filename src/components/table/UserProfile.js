@@ -293,11 +293,11 @@ const UserProfile = () => {
                     {paginatedItems?.map((profile, index) => (
                         <tr key={index}>
                             <td>{index + 1}</td>
-                            <td>{profile?.user?.first_name || "Not Added"} {profile?.last_name}</td>
-                            <td>{profile?.user?.username || "Not Added"} </td>
-                            <td>{profile.address || "Not Added"}</td>
+                            <td>{profile?.first_name || "----"} {profile?.last_name}</td>
+                            <td>{profile?.user?.username || "-----"} </td>
+                            <td>{profile.address || "-----"}</td>
                             <td>
-                                {profile.date_of_birth || "Not Added"}
+                                {profile.date_of_birth || "-----"}
                             </td>
 
                             <td>

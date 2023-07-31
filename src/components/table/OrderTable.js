@@ -184,8 +184,10 @@ const OrderTable = () => {
         // Check if filterName exists and matches the first name or order_id (case-insensitive)
         const nameMatch =
             filterName &&
-            (item.first_name.toLowerCase().includes(filterName.toLowerCase()) ||
-                item.order_id.toLowerCase().includes(filterName.toLowerCase()));
+            (item?.user_address?.full_name?.toLowerCase().includes(filterName.toLowerCase()) ||
+                item?.order_id?.toLowerCase().includes(filterName.toLowerCase())
+                || item?.user?.username?.toLowerCase().includes(filterName.toLowerCase())
+                );
 
         const statusMatch = filterStatus && item.status.toLowerCase().includes(filterStatus.toLowerCase())
 
@@ -327,7 +329,7 @@ const OrderTable = () => {
                     <br />
                     <Group position="apart">
                         <Text size="sm" weight={500}>
-                            Name: {selectedOrder?.first_name} {selectedOrder?.last_name}
+                            Name: {selectedOrder?.user_address?.full_name}
                         </Text>
                         <Text size="sm" weight={500}>
                             Phone: {selectedOrder?.phone}
@@ -436,7 +438,7 @@ const OrderTable = () => {
                                         width: '100px',
                                     }}
                                 >
-                                    {dayjs(order.order_date).format("DD/MM/YY")}
+                                    {dayjs(order.created_at).format("DD/MM/YY")}
                                 </Text>
                             </td>
                             <td>
@@ -445,7 +447,9 @@ const OrderTable = () => {
                                         width: '150px',
                                     }}
                                 >
-                                    {order.first_name} {order.last_naem}
+                                    {
+                                        order?.user_address?.full_name
+                                    }
                                 </Text>
                             </td>
                             <td>
@@ -463,7 +467,9 @@ const OrderTable = () => {
                                         width: '150px',
                                     }}
                                 >
-                                    {order.address}
+                                    {order?.user_address?.state} - {order?.user_address?.city} 
+                                    - {order?.user_address?.locality} - {order?.user_address?.landmark} 
+                                    - {order?.user_address?.pincode}
                                 </Text>
                             </td>
                             <td>

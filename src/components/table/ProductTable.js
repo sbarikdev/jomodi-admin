@@ -124,11 +124,6 @@ const ProductTable = () => {
                         },
                     }),
                 });
-
-                axios.get(
-
-                )
-
                 // Update the selectedProduct state to remove the deleted image
                 setSelectedProduct((prevSelectedProduct) => ({
                     ...prevSelectedProduct,
@@ -209,9 +204,9 @@ const ProductTable = () => {
             const formData = new FormData();
             selectedProduct?.category && formData.append("category", selectedProduct.category.id);
             selectedProduct?.brand && formData.append("brand", selectedProduct.brand.id);
+    
             // formData.append("category", selectedProduct.category);
             // formData.append("brand", selectedProduct.brand);
-            productImages && formData.append("image", productImages[0].image);
             formData.append("name", selectedProduct.name);
             formData.append("price", selectedProduct.price);
             formData.append("cancel_price", selectedProduct.cancel_price);
@@ -535,12 +530,12 @@ const ProductTable = () => {
 
                         <Col span={12}>
                             <Group position="left">
-                                {
+                                {/* {
                                     <div style={{ position: 'relative', display: 'inline-block' }}>
                                         <Image width={150} height={120} fit="contain" src={selectedProduct?.image} mx="auto" radius="md" />
                                     </div>
 
-                                }
+                                } */}
                                 {
                                     selectedProduct?.images.map((item, index) => (
                                         <div style={{ position: 'relative', display: 'inline-block' }}>
