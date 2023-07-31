@@ -200,13 +200,13 @@ const ProductTable = () => {
     console.log(selectedProduct)
 
     const handleProductEdit = () => {
+        const img = productImages[0]?.image
         if (selectedProduct) {
             const formData = new FormData();
             selectedProduct?.category && formData.append("category", selectedProduct.category.id);
             selectedProduct?.brand && formData.append("brand", selectedProduct.brand.id);
-    
-            // formData.append("category", selectedProduct.category);
-            // formData.append("brand", selectedProduct.brand);
+
+            isFile(img) && formData.append("image", img);
             formData.append("name", selectedProduct.name);
             formData.append("price", selectedProduct.price);
             formData.append("cancel_price", selectedProduct.cancel_price);
@@ -222,8 +222,6 @@ const ProductTable = () => {
             formData.append('size', JSON.stringify(selectedProduct?.size))
             formData.append('color', JSON.stringify(selectedProduct?.color))
             formData.append('gender', JSON.stringify(selectedProduct?.gender))
-
-
             axios
                 .patch(
                     `${API_URL}product/product/${selectedProduct.id}/`,
@@ -530,14 +528,14 @@ const ProductTable = () => {
 
                         <Col span={12}>
                             <Group position="left">
-                                {/* {
+                                {
                                     <div style={{ position: 'relative', display: 'inline-block' }}>
                                         <Image width={150} height={120} fit="contain" src={selectedProduct?.image} mx="auto" radius="md" />
                                     </div>
 
-                                } */}
+                                }
                                 {
-                                    selectedProduct?.images.map((item, index) => (
+                                    selectedProduct?.images?.map((item, index) => (
                                         <div style={{ position: 'relative', display: 'inline-block' }}>
                                             <Image width={150} height={120} fit="contain" src={item.image} key={index} mx="auto" radius="md" />
                                             <Button
