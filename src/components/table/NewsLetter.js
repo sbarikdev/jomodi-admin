@@ -60,6 +60,9 @@ const NewsLetter = () => {
                 <tr>
                     <th>ID</th>
                     <th>
+                        Name
+                    </th>
+                    <th>
                     Email
                     </th>
                     <th>
@@ -71,6 +74,7 @@ const NewsLetter = () => {
                 {paginatedItems.map((newsletter, index) => (
                     <tr key={newsletter.id}>
                         <td>{index}</td>
+                        <td>{newsletter.first_name}</td>
                         <td>{newsletter.email}</td>
                         <td>{dayjs(newsletter.created_at).format("DD/MM/YYYY")}</td>
                     </tr>

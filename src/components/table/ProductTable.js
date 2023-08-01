@@ -216,6 +216,7 @@ const ProductTable = () => {
             formData.append("new_arrival", selectedProduct.new_arrival);
             formData.append("top_product", selectedProduct.top_product);
             formData.append("new_product", selectedProduct.new_product);
+            formData.append('home_product', selectedProduct.home_product)
             formData.append("show_size", selectedProduct.show_size);
             formData.append("show_color", selectedProduct.show_color);
             formData.append('show_gender', selectedProduct.show_gender)
@@ -617,6 +618,14 @@ const ProductTable = () => {
                                 type="checkbox"
                                 checked={selectedProduct?.top_product}
                                 onChange={(e) => setSelectedProduct({ ...selectedProduct, top_product: e.target.checked })}
+                            />
+                        </Col>
+                        <Col span={4}>
+                            <Text size="sm">Show Home Product</Text>
+                            <input
+                                type="checkbox"
+                                checked={selectedProduct?.home_product}
+                                onChange={(e) => setSelectedProduct({ ...selectedProduct, home_product: e.target.checked })}
                             />
                         </Col>
                         <Col span={4}>

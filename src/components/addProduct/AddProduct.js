@@ -41,6 +41,7 @@ const AddProduct = () => {
   const [newArrival, setNewArrival] = useState(false);
   const [topProduct, setTopProduct] = useState(false);
   const [newProduct, setNewProduct] = useState(false);
+  const [homeProduct, setHomeProduct] = useState(false);
   const [showSize, setShowSize] = useState(false);
   const [showColor, setShowColor] = useState(false);
   const [showGender, setShowGender] = useState(false);
@@ -138,6 +139,7 @@ const AddProduct = () => {
     formData.append("new", newArrival);;
     formData.append("top_product", topProduct);
     formData.append("new_product", newProduct);
+    formData.append("home_product", homeProduct);
     formData.append("show_size", showSize);
     formData.append("show_color", showColor);
     formData.append('show_gender', showGender)
@@ -363,7 +365,13 @@ const AddProduct = () => {
                 onChange={(event) => setNewArrival(event.currentTarget.checked)}
               />
             </Col>
-
+            <Col span={4}>
+              <Checkbox
+                label="Show Home Product"
+                checked={homeProduct}
+                onChange={(event) => setHomeProduct(event.currentTarget.checked)}
+              />
+            </Col>
             <Col span={4}>
               <Checkbox
                 label="Show Top Product"
