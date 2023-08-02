@@ -32,6 +32,7 @@ import {
     Image,
 } from "@mantine/core";
 import FilterDiv from "../FilterDiv";
+import { CSVLink } from "react-csv";
 
 
 const ProductTable = () => {
@@ -168,6 +169,8 @@ const ProductTable = () => {
         setViewModalOpen(false);
         setSelectedProduct(null);
     };
+
+
 
 
     const handleProductDelete = (id) => {
@@ -351,6 +354,28 @@ const ProductTable = () => {
             },
         },
     };
+
+    const csvData = [
+        ["ID", "Name", "Price", "Cancel Price", "Category", "Brand", 'Image',
+            'Home Product', 'Top Product', 'Size', 'Gender', 'Color',
+            "In Stock", "Date Added"],
+        ...productData?.map((item) => [
+            item.id,
+            item.name,
+            item.price,
+            item.cancel_price,
+            item.category.name,
+            item.brand.name,
+            item.image,
+            item.home_product ? "Yes" : "No",
+            item.top_product ? "Yes" : "No",
+            item.size,
+            item.gender,
+            item.color,
+            item.available_quantity > 0 ? "Yes" : "No",
+            dayjs(item.created_at).format("DD/MM/YYYY"),
+        ]),
+    ];
     return (
         <div style={{
             backgroundColor: 'white',
@@ -366,6 +391,17 @@ const ProductTable = () => {
             >
                 Product Table
             </h3>
+            <CSVLink
+                data={csvData}
+                filename={"jomodi_product.csv"}
+                className="btn btn-primary"
+                target="_blank"
+                style={{
+                    textDecoration: 'none',
+                }}
+            >
+                Export Data
+            </CSVLink>
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <TextInput
                     label="Name"
