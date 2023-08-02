@@ -29,7 +29,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const [allCategory, setAllCategory] = useState([]);
   const [allBrand, setAllBrand] = useState([]);
-  const {user} = useAuth()
+  const { user } = useAuth()
   // const [image, setImage] = useState({ base64: "", files: [] });
   const [category, setCategory] = useState("");
   const [brand, setBrand] = useState("");
@@ -51,12 +51,19 @@ const AddProduct = () => {
   const [showColorModal, setShowColorModal] = useState(false)
   const [showGenderModal, setShowGenderModal] = useState(false)
   const [sizes, setSizes] = useState('')
-  const [colors, setColors] = useState("")
+  const [colors, setColors] = useState([])
   const [genders, setGenders] = useState("")
   const [loading, setLoading] = useState(false)
   const [productImages, setProductImages] = useState([
     { image: [] }
   ])
+  const [colorImage, setColorImage] = useState([
+    {
+      color: "",
+      image: []
+    }
+  ])
+
 
   const [csvFile, setCsvFile] = useState([])
 
@@ -78,6 +85,27 @@ const AddProduct = () => {
     setProductImages(values);
   }
 
+
+  const handleAddColorImageField = () => {
+    setColorImage([...colorImage, { color: "", image: "" }])
+  }
+
+  const handleRemoveColorImageField = (index) => {
+    const values = [...colorImage];
+    values.splice(index, 1);
+    setColorImage(values);
+  }
+
+  const handleColorChange = (e, index) => {
+    const updatedColorImage = [...colorImage];
+    if (e.target.type === "file") {
+      updatedColorImage[index].image = e.target.files[0];
+    } else {
+      updatedColorImage[index].color = e.target.value;
+    }
+
+    setColorImage(updatedColorImage);
+  };
 
   const handleImageChange = (files, index) => {
     const updatedProductImages = [...productImages];
@@ -126,6 +154,24 @@ const AddProduct = () => {
   }
   );
 
+  // const [colors, setColors] = useState([]);
+
+  const colorOptions = [
+    // Your { value: "red", label: "Red" },
+    { value: "blue", label: "Blue" },
+    { value: "green", label: "Green" },
+    { value: "yellow", label: "Yellow" },
+    { value: "black", label: "Black" },
+    { value: "white", label: "White" },
+    { value: "pink", label: "Pink" },
+    { value: "purple", label: "Purple" },
+    { value: "orange", label: "Orange" },
+    { value: "brown", label: "Brown" },
+    { value: "gray", label: "Gray" },
+    { value: "silver", label: "Silver" },
+    { value: "gold", label: "Gold" },
+  ];
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true)
@@ -155,28 +201,47 @@ const AddProduct = () => {
       .post(`${API_URL}product/product/`, formData)
       .then((res) => {
         console.log(res);
-        productImages.forEach((file) => {
+        const productImagePromises = productImages?.map((file) => {
           const formDat = new FormData();
           formDat.append("product", res.data.id);
           formDat.append("image", file.image);
-          axios.post(`${API_URL}product/product_image/`, formDat);
+          return axios.post(`${API_URL}product/product_image/`, formDat);
         });
-        setLoading(false)
-        notifications.show({
-          title: "Product Added",
-          message: "Product Added Successfully",
-          color: "blue",
-          autoClose: 5000,
+
+        const colorImagePromises = colorImage?.map((file) => {
+          const formDat = new FormData();
+          formDat.append("product", res.data.id);
+          formDat.append("color", file.color);
+          formDat.append("image", file.image);
+          return axios.post(`${API_URL}product/colorimage_fetch/`, formDat);
         });
-        navigate('/dashboard')
+
+        // Combine all promises for parallel execution
+        Promise.all([...productImagePromises, ...colorImagePromises])
+          .then(() => {
+            setLoading(false);
+            notifications.show({
+              title: "Product Added",
+              message: "Product Added Successfully",
+              color: "blue",
+              autoClose: 5000,
+            });
+            navigate('/dashboard');
+          })
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+            alert("Something went wrong");
+          });
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false)
+        setLoading(false);
         alert("Something went wrong");
       });
   };
 
+  console.log(colorImage)
 
   return (
     <Container size="sm">
@@ -193,30 +258,56 @@ const AddProduct = () => {
         </Modal.Body>
         <Button onClick={() => setShowSizeModal(false)}>Save</Button>
       </Modal>
-      <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md" height={500}>
-        <MultiSelect
-          data={[
-            { value: "red", label: "Red" },
-            { value: "blue", label: "Blue" },
-            { value: "green", label: "Green" },
-            { value: "yellow", label: "Yellow" },
-            { value: "black", label: "Black" },
-            { value: "white", label: "White" },
-            { value: "pink", label: "Pink" },
-            { value: "purple", label: "Purple" },
-            { value: "orange", label: "Orange" },
-            { value: "brown", label: "Brown" },
-            { value: "gray", label: "Gray" },
-            { value: "silver", label: "Silver" },
-            { value: "gold", label: "Gold" },
-          ]}
-          label="Product Color"
-          placeholder="Enter Color"
-          value={colors}
-          onChange={setColors
-          }
-        />
-        <Button onClick={() => setShowColorModal(false)} mt={300}>Save </Button>
+      <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md" height={900}>
+             {
+            colorImage.map((item, index) => {
+              return (
+                <>
+                  <select 
+                  className="form-control"
+                  onChange={(e) => handleColorChange(e, index)}>
+                    <option value="">Select Color</option>
+                    {
+                      colorOptions.map((item) => {
+                        return (
+                          <option value={item.value}>{item.label}</option>
+                        )
+                      })
+                    }
+                  </select>
+
+                  <input
+                    type="file"
+                    onChange={(e) => handleColorChange(e, index)}
+                    label="Images"
+                    placeholder="Additional Images"
+                  />
+                  <Group position="right">
+                    <Button size="xs" color="red" onClick={() => handleRemoveColorImageField(index)}>
+                      <IconMinus size={20} />
+                    </Button>
+                  </Group>
+                </>
+                
+              )})
+             }
+              
+          
+          <Group position="left">
+            <Button
+              size="xs"
+              my="xl"
+              color="teal"
+              onClick={handleAddColorImageField}>
+              <IconPlus size={20} />
+            </Button>
+          </Group>
+
+
+        <Button onClick={() => setShowColorModal(false)} colorScheme="blue">
+          Save
+        </Button>
+
       </Modal>
 
       <Modal opened={showGenderModal} onClose={() => setShowGenderModal(false)} size="md" height={500}>
@@ -236,8 +327,8 @@ const AddProduct = () => {
         <Button onClick={() => setShowGenderModal(false)} mt={300}>Save </Button>
       </Modal>
       <Group position="apart">
-      <h1>Add Product</h1> 
-     
+        <h1>Add Product</h1>
+
       </Group>
       {
         loading && (
@@ -269,7 +360,7 @@ const AddProduct = () => {
                 onChange={setBrand}
               />
             </Col>
-            
+
             <Col span={6}>
               <NumberInput
                 value={price}
