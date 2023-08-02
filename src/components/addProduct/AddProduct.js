@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { Editor, EditorState } from "draft-js";
 import { useAuth } from "../../context/auth-context";
 import "draft-js/dist/Draft.css";
-import { CSVLink } from "react-csv";
+
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -57,6 +57,8 @@ const AddProduct = () => {
   const [productImages, setProductImages] = useState([
     { image: [] }
   ])
+
+  const [csvFile, setCsvFile] = useState([])
 
   const [editorState, setEditorState] = React.useState(() =>
     EditorState.createEmpty()
@@ -176,30 +178,6 @@ const AddProduct = () => {
   };
 
 
-  const importCSV = (data) => {
-    // Process imported CSV data and perform actions accordingly
-    // Example:
-    axios.post(`${API_URL}product/import`, data)
-      .then((res) => {
-        console.log(res.data);
-        notifications.show({
-          title: "CSV Imported",
-          message: "CSV data imported successfully",
-          color: "green",
-          autoClose: 5000,
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        notifications.show({
-          title: "CSV Import Error",
-          message: "An error occurred while importing CSV data",
-          color: "red",
-          autoClose: 5000,
-        });
-      });
-  };
-
   return (
     <Container size="sm">
       <Modal opened={showSizeModal} onClose={() => setShowSizeModal(false)} size="md">
@@ -259,20 +237,7 @@ const AddProduct = () => {
       </Modal>
       <Group position="apart">
       <h1>Add Product</h1> 
-
-      <FileInput
-        label="Import Data"
-        accept=".csv"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const csvData = event.target.result;
-            importCSV(csvData);
-          };
-          reader.readAsText(file);
-        }}
-      />
+     
       </Group>
       {
         loading && (
