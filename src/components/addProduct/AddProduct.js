@@ -206,15 +206,14 @@ const AddProduct = () => {
           formDat.append("product", res.data.id);
           formDat.append("image", file.image);
           return axios.post(`${API_URL}product/product_image/`, formDat);
-        });
-
+        }) || []
         const colorImagePromises = colorImage?.map((file) => {
           const formDat = new FormData();
           formDat.append("product", res.data.id);
           formDat.append("color", file.color);
           formDat.append("image", file.image);
           return axios.post(`${API_URL}product/colorimage_fetch/`, formDat);
-        });
+        }) || []
 
         // Combine all promises for parallel execution
         Promise.all([...productImagePromises, ...colorImagePromises])

@@ -10,7 +10,8 @@ import {
     Modal,
     TextInput,
     MultiSelect,
-    Pagination
+    Pagination,
+    Loader
 } from "@mantine/core";
 import axios, { all } from "axios";
 import { API_URL } from "../../constant";
@@ -43,6 +44,7 @@ const ProductTable = () => {
     const [allCategory, setAllCategory] = useState([]);
     const [allBrand, setAllBrand] = useState([]);
     const [search, setSearch] = useState("");
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [productImages, setProductImages] = useState([
         { image: [] }
     ])
@@ -57,6 +59,12 @@ const ProductTable = () => {
     const [sizes, setSizes] = useState('')
     const [colors, setColors] = useState("")
     const [genders, setGenders] = useState("")
+    const [colorImage, setColorImage] = useState([
+        {
+            color: "",
+            image: []
+        }
+    ])
 
 
 
@@ -75,6 +83,28 @@ const ProductTable = () => {
         const updatedProductImages = [...productImages];
         updatedProductImages[index].image = files;
         setProductImages(updatedProductImages);
+    };
+
+
+    const handleAddColorImageField = () => {
+        setColorImage([...colorImage, { color: "", image: "" }])
+    }
+
+    const handleRemoveColorImageField = (index) => {
+        const values = [...colorImage];
+        values.splice(index, 1);
+        setColorImage(values);
+    }
+
+    const handleColorChange = (e, index) => {
+        const updatedColorImage = [...colorImage];
+        if (e.target.type === "file") {
+            updatedColorImage[index].image = e.target.files[0];
+        } else {
+            updatedColorImage[index].color = e.target.value;
+        }
+
+        setColorImage(updatedColorImage);
     };
 
     useEffect(() => {
@@ -204,6 +234,7 @@ const ProductTable = () => {
 
     const handleProductEdit = () => {
         const img = productImages[0]?.image
+        setSubmitLoading(true);
         if (selectedProduct) {
             const formData = new FormData();
             selectedProduct?.category && formData.append("category", selectedProduct.category.id);
@@ -244,7 +275,7 @@ const ProductTable = () => {
                             setProductData(res.data.results);
                         })
 
-                    productImages?.forEach((file) => {
+                   const productImagePromises =  productImages?.forEach((file) => {
                         const formDat = new FormData();
                         if (isFile(file.image)) {
                             formDat.append("product", selectedProduct.id);
@@ -252,26 +283,63 @@ const ProductTable = () => {
                             axios.post(`${API_URL}product/product_image/`, formDat);
                         }
 
-                    });
+                    }) || []
 
-                    handleEditModalClose();
+                    const colorImagePromises = colorImage?.map((file) => {
+                        const formDat = new FormData();
+                        formDat.append("product", res.data.id);
+                        formDat.append("color", file.color);
+                        formDat.append("image", file.image);
+                        return axios.post(`${API_URL}product/colorimage_fetch/`, formDat);
+                    }) || []
 
-                    notifications.show({
-                        title: "Status",
-                        message: "Product Updated",
-                        color: "white",
-                        styles: (theme) => ({
-                            root: {
-                                backgroundColor: theme.colors.teal[0],
-                                borderColor: theme.colors.teal[6],
-                                "&::before": { backgroundColor: theme.white },
-                            },
-                        }),
-                    });
+                    Promise.all([...productImagePromises, ...colorImagePromises])
+                        .then(() => {
+                            setSubmitLoading(false);
+                            handleEditModalClose();
+
+                            notifications.show({
+                                title: "Status",
+                                message: "Product Updated",
+                                color: "white",
+                                styles: (theme) => ({
+                                    root: {
+                                        backgroundColor: theme.colors.teal[0],
+                                        borderColor: theme.colors.teal[6],
+                                        "&::before": { backgroundColor: theme.white },
+                                    },
+                                }),
+                            });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            setSubmitLoading(false);
+                            alert("Something went wrong");
+                        });
                 })
                 .catch((err) => {
                     console.log(err);
+                    setSubmitLoading(false);
+                    alert("Something went wrong");
                 });
+            //     handleEditModalClose();
+
+            //     notifications.show({
+            //         title: "Status",
+            //         message: "Product Updated",
+            //         color: "white",
+            //         styles: (theme) => ({
+            //             root: {
+            //                 backgroundColor: theme.colors.teal[0],
+            //                 borderColor: theme.colors.teal[6],
+            //                 "&::before": { backgroundColor: theme.white },
+            //             },
+            //         }),
+            //     });
+            // })
+            // .catch((err) => {
+            //     console.log(err);
+            // });
         }
     };
 
@@ -307,6 +375,22 @@ const ProductTable = () => {
     //         item.brand.name.toLowerCase().includes(filterName.toLowerCase())
     //     );
     // });
+
+    const colorOptions = [
+        // Your { value: "red", label: "Red" },
+        { value: "blue", label: "Blue" },
+        { value: "green", label: "Green" },
+        { value: "yellow", label: "Yellow" },
+        { value: "black", label: "Black" },
+        { value: "white", label: "White" },
+        { value: "pink", label: "Pink" },
+        { value: "purple", label: "Purple" },
+        { value: "orange", label: "Orange" },
+        { value: "brown", label: "Brown" },
+        { value: "gray", label: "Gray" },
+        { value: "silver", label: "Silver" },
+        { value: "gold", label: "Gold" },
+    ];
 
     const filterData = productData.filter((item) => {
         // Check if filterCategory is an array and includes the category ID
@@ -455,29 +539,55 @@ const ProductTable = () => {
                         <Button onClick={() => setShowSizeModal(false)}>Save</Button>
                     </Modal>
                     <Modal opened={showColorModal} onClose={() => setShowColorModal(false)} size="md" height={500}>
-                        <MultiSelect
-                            data={[
-                                { value: "red", label: "Red" },
-                                { value: "blue", label: "Blue" },
-                                { value: "green", label: "Green" },
-                                { value: "yellow", label: "Yellow" },
-                                { value: "black", label: "Black" },
-                                { value: "white", label: "White" },
-                                { value: "pink", label: "Pink" },
-                                { value: "purple", label: "Purple" },
-                                { value: "orange", label: "Orange" },
-                                { value: "brown", label: "Brown" },
-                                { value: "gray", label: "Gray" },
-                                { value: "silver", label: "Silver" },
-                                { value: "gold", label: "Gold" },
-                            ]}
-                            label="Product Color"
-                            placeholder="Enter Color"
-                            value={selectedProduct?.color}
-                            onChange={(e) => setSelectedProduct({ ...selectedProduct, color: e })
-                            }
-                        />
-                        <Button onClick={() => setShowColorModal(false)} mt={300}>Save </Button>
+                        {
+                            colorImage.map((item, index) => {
+                                return (
+                                    <>
+                                        <select
+                                            className="form-control"
+                                            onChange={(e) => handleColorChange(e, index)}>
+                                            <option value="">Select Color</option>
+                                            {
+                                                colorOptions.map((item) => {
+                                                    return (
+                                                        <option value={item.value}>{item.label}</option>
+                                                    )
+                                                })
+                                            }
+                                        </select>
+
+                                        <input
+                                            type="file"
+                                            onChange={(e) => handleColorChange(e, index)}
+                                            label="Images"
+                                            placeholder="Additional Images"
+                                        />
+                                        <Group position="right">
+                                            <Button size="xs" color="red" onClick={() => handleRemoveColorImageField(index)}>
+                                                <IconMinus size={20} />
+                                            </Button>
+                                        </Group>
+                                    </>
+
+                                )
+                            })
+                        }
+
+
+                        <Group position="left">
+                            <Button
+                                size="xs"
+                                my="xl"
+                                color="teal"
+                                onClick={handleAddColorImageField}>
+                                <IconPlus size={20} />
+                            </Button>
+                        </Group>
+
+
+                        <Button onClick={() => setShowColorModal(false)} colorScheme="blue">
+                            Save
+                        </Button>
                     </Modal>
 
                     <Modal opened={showGenderModal} onClose={() => setShowGenderModal(false)} size="md" height={500}>
@@ -500,6 +610,11 @@ const ProductTable = () => {
                     <Modal.Title>Edit Product</Modal.Title>
 
                     <Grid>
+                        {
+                            submitLoading && (
+                                <Loader variant="dots" />
+                            )
+                        }
                         <Col span={12}>
                             <Select
                                 label="Select Category"
@@ -828,6 +943,7 @@ const ProductTable = () => {
                     <Button m="xl" onClick={handleEditModalClose}>Cancel</Button>
                     <Button m="xl"
                         onClick={handleProductEdit}
+                        disabled={submitLoading}
                         color="blue">Update</Button>
 
 
