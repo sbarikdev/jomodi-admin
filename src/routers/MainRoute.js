@@ -19,6 +19,8 @@ import UserProfile from '../components/table/UserProfile';
 import NewsLetter from '../components/table/NewsLetter';
 import UserOrder from '../components/table/UserOrder';
 import PrivateRoute from './PrivateRoute';
+import CouponTable from '../components/table/CouponTable';
+import AddCoupon from '../components/addProduct/AddCoupon';
 import { useAuth } from '../context/auth-context';
 
 function MainRoute() {
@@ -52,6 +54,8 @@ function MainRoute() {
                 <Route path="user" element={wrapPrivateRoute(<UserProfile />, isAuthenticated)} />
                 <Route path="newsletter" element={wrapPrivateRoute(<NewsLetter />, isAuthenticated)} />
                 <Route path="user-order/:id" element={wrapPrivateRoute(<UserOrder />, isAuthenticated)} />
+                <Route path="coupon-table" element={wrapPrivateRoute(<CouponTable />, isAuthenticated)} />
+                <Route path="add-coupon" element={wrapPrivateRoute(<AddCoupon />, isAuthenticated)} />
                 <Route path="*" element={<h1>Not Found</h1>} />
             </Route>
             <Route path="/login" element={<Login />} />

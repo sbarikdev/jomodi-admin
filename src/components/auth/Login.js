@@ -13,15 +13,22 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
       const credentials = {
         username: username,
         password: password,
       };
+
+      // Assuming login is an async function that returns a decoded user object
       const decoded = await login(credentials);
+
+      // Check for admin and active status in the decoded user object
       if (decoded.admin === true && decoded.active === true) {
+        // Navigate to dashboard only if authorized and active
         navigate('/dashboard');
 
+        // Show a successful login notification
         notifications.show({
           title: 'Login Successful',
           message: `Welcome ${decoded?.username}`,
@@ -29,6 +36,7 @@ const Login = () => {
           autoClose: 5000,
         });
       } else {
+        // Show an unauthorized access notification
         notifications.show({
           title: 'Not Authorized',
           message: 'You are not authorized to access this page',
@@ -36,9 +44,8 @@ const Login = () => {
           autoClose: 5000,
         });
       }
-      // Navigate to '/dashboard' only if the login is successful and authorized
-
     } catch (err) {
+      // Show a login failed notification if an error occurs
       notifications.show({
         title: 'Login Failed',
         message: err.message,

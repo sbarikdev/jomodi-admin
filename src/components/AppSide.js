@@ -1,5 +1,6 @@
 import React from 'react';
-import { Navbar, Group, Code, ScrollArea, createStyles, rem,
+import {
+    Navbar, Group, Code, ScrollArea, createStyles, rem,
     Box,
     Collapse,
     ThemeIcon,
@@ -34,7 +35,8 @@ const mockdata = [
             { label: 'Products', link: '/add-product' },
             { label: 'Category', link: '/add-category' },
             { label: 'Brand', link: '/add-brand' },
-            { label: 'Banner', link: '/add-banner'}
+            { label: 'Banner', link: '/add-banner' },
+            { label: 'Coupon', link: '/add-coupon' }
         ],
     },
     {
@@ -47,6 +49,7 @@ const mockdata = [
             { label: 'Brand', link: '/brand-table' },
             { label: 'User', link: '/user' },
             { label: 'NewLetter', link: '/newsletter' },
+            { label: 'Coupon', link: '/coupon-table' }
         ],
     },
     // { label: 'Analytics', icon: IconPresentationAnalytics },
@@ -114,7 +117,7 @@ export default function AppSide() {
     return (
         <Navbar width={{ sm: 200 }} p="md" className={classes.navbar}>
             <Navbar.Section grow className={classes.links} component={ScrollArea}>
-                
+
                 <div className={classes.linksInner}>
 
                     {links}</div>
@@ -129,14 +132,14 @@ export default function AppSide() {
                 {
                     isAuthenticated && (
                         <UnstyledButton onClick={handleLogout}
-                        style={{
-                            marginTop: 20,
-                            marginLeft: 20,
-                        }}
+                            style={{
+                                marginTop: 20,
+                                marginLeft: 20,
+                            }}
                         >Logout</UnstyledButton>
                     )
                 }
-  
+
             </Navbar.Section>
         </Navbar>
     );
