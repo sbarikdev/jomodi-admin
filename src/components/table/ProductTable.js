@@ -37,6 +37,7 @@ import { CSVLink } from "react-csv";
 
 
 const ProductTable = () => {
+    const [selectColorImage, setSelectColorImage] = useState([])
     const [productData, setProductData] = useState([]);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -52,7 +53,6 @@ const ProductTable = () => {
     const [filterCategory, setFilterCategory] = useState("");
     const [filterBrand, setFilterBrand] = useState("");
     const [filteredData, setFilteredData] = useState([]);
-
     const [showSizeModal, setShowSizeModal] = useState(false)
     const [showColorModal, setShowColorModal] = useState(false)
     const [showGenderModal, setShowGenderModal] = useState(false)
@@ -67,7 +67,6 @@ const ProductTable = () => {
     ])
 
 
-
     const handleAddProductImageField = () => {
         setProductImages([...productImages, { image: "" }])
     }
@@ -78,6 +77,17 @@ const ProductTable = () => {
         setProductImages(values);
     }
 
+    useEffect(() => {
+        axios
+            .get(`${API_URL}product/image_fetch/?product_id=${selectedProduct?.id}`)
+            .then((res) => {
+                console.log(res.data);
+                setSelectColorImage(res.data)
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [selectedProduct]);
 
     const handleImageChange = (files, index) => {
         const updatedProductImages = [...productImages];
@@ -263,28 +273,20 @@ const ProductTable = () => {
                     formData
                 )
                 .then((res) => {
-                    console.log("jere")
-                    console.log(res.data);
-
-                    console.log(formData)
-
                     axios
                         .get(`${API_URL}product/product_detail/`)
                         .then((res) => {
                             console.log(res.data.results);
                             setProductData(res.data.results);
                         })
-
-                   const productImagePromises =  productImages?.forEach((file) => {
+                    const productImagePromises = productImages?.forEach((file) => {
                         const formDat = new FormData();
                         if (isFile(file.image)) {
                             formDat.append("product", selectedProduct.id);
                             formDat.append("image", file.image);
                             axios.post(`${API_URL}product/product_image/`, formDat);
                         }
-
                     }) || []
-
                     const colorImagePromises = colorImage?.map((file) => {
                         const formDat = new FormData();
                         formDat.append("product", res.data.id);
@@ -292,12 +294,10 @@ const ProductTable = () => {
                         formDat.append("image", file.image);
                         return axios.post(`${API_URL}product/colorimage_fetch/`, formDat);
                     }) || []
-
                     Promise.all([...productImagePromises, ...colorImagePromises])
                         .then(() => {
                             setSubmitLoading(false);
                             handleEditModalClose();
-
                             notifications.show({
                                 title: "Status",
                                 message: "Product Updated",
@@ -322,27 +322,8 @@ const ProductTable = () => {
                     setSubmitLoading(false);
                     alert("Something went wrong");
                 });
-            //     handleEditModalClose();
-
-            //     notifications.show({
-            //         title: "Status",
-            //         message: "Product Updated",
-            //         color: "white",
-            //         styles: (theme) => ({
-            //             root: {
-            //                 backgroundColor: theme.colors.teal[0],
-            //                 borderColor: theme.colors.teal[6],
-            //                 "&::before": { backgroundColor: theme.white },
-            //             },
-            //         }),
-            //     });
-            // })
-            // .catch((err) => {
-            //     console.log(err);
-            // });
         }
     };
-
     useEffect(() => {
         axios
             .get(`${API_URL}product/product_detail/`)
@@ -354,7 +335,6 @@ const ProductTable = () => {
                 console.log(err);
             });
     }, []);
-
     const handleChange = (name) => {
         return (eventOrValue) => {
             const value = eventOrValue?.target?.checked ?? eventOrValue;
@@ -365,19 +345,10 @@ const ProductTable = () => {
             }));
         };
     };
-    // useEffect to handle filtering when filter criteria change
-    // const filterData = productData.filter((item) => {
-    //     return (
-    //         filterCategory.includes(item.category.id) ||
-    //         filterBrand.includes(item.brand.id) ||
-    //         item.name.toLowerCase().includes(filterName.toLowerCase()) ||
-    //         item.category.name.toLowerCase().includes(filterName.toLowerCase()) ||
-    //         item.brand.name.toLowerCase().includes(filterName.toLowerCase())
-    //     );
-    // });
 
     const colorOptions = [
-        // Your { value: "red", label: "Red" },
+        // Your 
+        { value: "red", label: "Red" },
         { value: "blue", label: "Blue" },
         { value: "green", label: "Green" },
         { value: "yellow", label: "Yellow" },
@@ -464,9 +435,6 @@ const ProductTable = () => {
         <div style={{
             backgroundColor: 'white',
         }}>
-
-
-
             <h3
                 style={{
                     textAlign: 'center',

@@ -10,7 +10,6 @@ import { DateInput } from "@mantine/dates";
 
 
 const CouponTable = () => {
-
     const [couponData, setCouponData] = useState([]);
     const [selectCoupon, setSelectCoupon] = useState(null);
     const [editModalOpen, setEditModalOpen] = useState(false);
