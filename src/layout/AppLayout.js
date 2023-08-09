@@ -12,7 +12,7 @@ function MainLayout(props) {
   return (
       <AppShell
         padding="md"
-        navbar={<Navbar width={{ base: 300 }} height={500} p="xs">
+        navbar={<Navbar width={{ base: 200 }} height={500} p="xs">
           <AppSide />
         </Navbar>}
         header={<Header height={60} p="xs">

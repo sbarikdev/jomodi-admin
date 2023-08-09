@@ -9,7 +9,7 @@ import {
     createStyles,
     rem,
 } from '@mantine/core';
-import { IconCalendarStats, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconCalendarStats, IconChevronLeft, IconChevronRight, IconGauge } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const useStyles = createStyles((theme) => ({
@@ -64,41 +64,53 @@ export function LinksGroup({ icon: Icon, label, initiallyOpened, links }) {
     const [opened, setOpened] = useState(initiallyOpened || false);
     const ChevronIcon = theme.dir === 'ltr' ? IconChevronRight : IconChevronLeft;
     const items = (hasLinks ? links : []).map((link) => (
-    <Text
-      className = { classes.link }
-      key = { link.label }
-      onClick = {() => navigate(link.link)
-}
-    >
-    { link.label }
-    </Text >
-  ));
+        <Text
+            className={classes.link}
+            key={link.label}
+            onClick={() => navigate(link.link)
+            }
+        >
+            {link.label}
+        </Text >
+    ));
 
-return (
-    <>
-        <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
-            <Group position="apart" spacing={0}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <ThemeIcon variant="light" size={30}>
-                        <Icon size="1.1rem" />
-                    </ThemeIcon>
-                    <Box ml="md">{label}</Box>
-                </Box>
-                {hasLinks && (
-                    <ChevronIcon
-                        className={classes.chevron}
-                        size="1rem"
-                        stroke={1.5}
-                        style={{
-                            transform: opened ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)` : 'none',
-                        }}
-                    />
-                )}
-            </Group>
-        </UnstyledButton>
-        {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
-    </>
-);
+    return (
+        <>
+            <UnstyledButton onClick={() => navigate('/dashboard')} className={classes.control}>
+                <Group position="apart" spacing={0}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <ThemeIcon variant="light" size={30}>
+                            <IconGauge size="1.1rem" />
+                        </ThemeIcon>
+                        <Box ml="md">
+                            Dashboard
+                        </Box>
+                    </Box>
+                </Group>
+            </UnstyledButton>
+            <UnstyledButton onClick={() => setOpened((o) => !o)} className={classes.control}>
+                <Group position="apart" spacing={0}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <ThemeIcon variant="light" size={30}>
+                            <Icon size="1.1rem" />
+                        </ThemeIcon>
+                        <Box ml="md">{label}</Box>
+                    </Box>
+                    {hasLinks && (
+                        <ChevronIcon
+                            className={classes.chevron}
+                            size="1rem"
+                            stroke={1.5}
+                            style={{
+                                transform: opened ? `rotate(${theme.dir === 'rtl' ? -90 : 90}deg)` : 'none',
+                            }}
+                        />
+                    )}
+                </Group>
+            </UnstyledButton>
+            {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
+        </>
+    );
 }
 
 const mockdata = {
